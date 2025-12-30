@@ -1,0 +1,261 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-inter: 'Inter', sans-serif;
+    --font-orbitron: 'Orbitron', monospace;
+  }
+  
+  html {
+    overflow-x: hidden;
+    width: 100%;
+  }
+  
+  body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+    position: relative;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@layer utilities {
+  .font-inter {
+    font-family: var(--font-inter);
+  }
+  
+  .font-orbitron {
+    font-family: var(--font-orbitron);
+  }
+}
+
+/* Custom wallet adapter styles */
+.wallet-adapter-button {
+  background: linear-gradient(to right, #FF1B8D, #8B5CF6) !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  padding: 0.5rem 1.5rem !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 600 !important;
+  color: white !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 0 20px rgba(255, 27, 141, 0.3) !important;
+}
+
+.wallet-adapter-button:hover {
+  box-shadow: 0 0 30px rgba(255, 27, 141, 0.5) !important;
+  transform: scale(1.05) !important;
+}
+
+.wallet-adapter-modal-wrapper {
+  background: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.wallet-adapter-modal {
+  background: linear-gradient(135deg, #1a1a1a, #2d1b69) !important;
+  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 0 40px rgba(139, 92, 246, 0.3) !important;
+}
+
+.wallet-adapter-modal-title {
+  color: white !important;
+  font-family: 'Orbitron', monospace !important;
+  font-weight: bold !important;
+}
+
+.wallet-adapter-modal-list {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 12px !important;
+}
+
+.wallet-adapter-modal-list-item {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(139, 92, 246, 0.2) !important;
+  border-radius: 8px !important;
+  color: white !important;
+  transition: all 0.3s ease !important;
+}
+
+.wallet-adapter-modal-list-item:hover {
+  background: rgba(139, 92, 246, 0.2) !important;
+  border-color: #8B5CF6 !important;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3) !important;
+}
+
+.wallet-adapter-modal-button-close {
+  background: rgba(255, 27, 141, 0.2) !important;
+  border: 1px solid rgba(255, 27, 141, 0.3) !important;
+  color: #FF1B8D !important;
+  border-radius: 50% !important;
+  transition: all 0.3s ease !important;
+}
+
+.wallet-adapter-modal-button-close:hover {
+  background: rgba(255, 27, 141, 0.3) !important;
+  box-shadow: 0 0 20px rgba(255, 27, 141, 0.4) !important;
+}
+
+/* Custom component styles */
+@layer components {
+  .card {
+    @apply bg-gray-900/50 border border-gray-800 rounded-xl p-6;
+  }
+  
+  .card-hover {
+    @apply hover:border-gray-700 hover:bg-gray-900/70 transition-all duration-300;
+  }
+  
+  .btn-primary {
+    @apply px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent;
+  }
+  
+  .text-electric-blue {
+    @apply text-blue-400;
+  }
+  
+  .text-electric-purple {
+    @apply text-purple-400;
+  }
+  
+  .text-neon-pink {
+    @apply text-pink-400;
+  }
+  
+  .text-neon-cyan {
+    @apply text-cyan-400;
+  }
+  
+  .bg-card {
+    @apply bg-gray-800;
+  }
+  
+  .border-border-color {
+    @apply border-gray-700;
+  }
+}
+
+/* Mobile-specific fixes */
+@layer utilities {
+  /* Prevent horizontal overflow */
+  .mobile-container {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    position: relative;
+  }
+  
+  /* Responsive text sizing */
+  .mobile-text-sm {
+    @apply text-xs sm:text-sm;
+  }
+  
+  .mobile-text-base {
+    @apply text-sm sm:text-base;
+  }
+  
+  /* Responsive padding */
+  .mobile-px {
+    @apply px-2 sm:px-4 md:px-6;
+  }
+  
+  .mobile-py {
+    @apply py-2 sm:py-4 md:py-6;
+  }
+  
+  /* Prevent text overflow */
+  .text-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* Mobile-friendly tables */
+  .mobile-table {
+    @apply w-full;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  @media (max-width: 640px) {
+    .mobile-table {
+      display: block;
+    }
+    
+    .mobile-table thead {
+      display: none;
+    }
+    
+    .mobile-table tbody,
+    .mobile-table tr,
+    .mobile-table td {
+      display: block;
+      width: 100%;
+    }
+    
+    .mobile-table tr {
+      margin-bottom: 1rem;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+    }
+    
+    .mobile-table td {
+      padding: 0.5rem 0;
+      text-align: left;
+      border: none;
+    }
+    
+    .mobile-table td:before {
+      content: attr(data-label) ": ";
+      font-weight: 600;
+      display: inline-block;
+      min-width: 100px;
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+/* Fix for mobile viewport issues */
+@media (max-width: 768px) {
+  body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  /* Ensure all containers respect viewport width */
+  .container,
+  .max-w-7xl,
+  .max-w-6xl,
+  .max-w-5xl,
+  .max-w-4xl {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Fix for flex containers that might overflow */
+  .flex {
+    flex-wrap: wrap;
+  }
+  
+  /* Prevent text from overflowing */
+  h1, h2, h3, h4, h5, h6, p, span, div {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+} 
