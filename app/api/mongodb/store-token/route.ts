@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { storeTokenDataInMongoDB, storeCreatorWalletInMongoDB } from '../../../lib/mongodbStorage';
-import { TokenData } from '../../../lib/githubOnlyStorage';
+import { TokenData } from '../../../lib/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
 
     // Store token data
     const tokenResult = await storeTokenDataInMongoDB(tokenData as TokenData);
-    
+
     // Also store creator wallet if provided
     let creatorResult = null;
     if (creatorWallet && tokenData.mintAddress) {
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
         tokenData.mintAddress
       );
     }
-    
+
     return NextResponse.json({
       success: tokenResult.success,
       tokenId: tokenResult.id,

@@ -1,6 +1,6 @@
 import { MongoClient, MongoClientOptions, Db, Collection } from 'mongodb';
 import { attachDatabasePool } from '@vercel/functions';
-import { TokenData } from './githubOnlyStorage';
+import { TokenData } from './types';
 
 // MongoDB configuration - read at runtime
 function getMongoConfig() {
@@ -15,7 +15,7 @@ let mongoDb: Db | null = null;
 
 async function getMongoClient(): Promise<MongoClient | null> {
   const config = getMongoConfig();
-  
+
   if (!config.uri) {
     return null;
   }
@@ -30,14 +30,14 @@ async function getMongoClient(): Promise<MongoClient | null> {
       appName: "memehaus-token-storage",
       maxIdleTimeMS: 5000,
     };
-    
+
     mongoClient = new MongoClient(config.uri, options);
-    
+
     // Attach the client to ensure proper cleanup on function suspension (Vercel pattern)
     attachDatabasePool(mongoClient);
-    
+
     await mongoClient.connect();
-    
+
     console.log('✅ MongoDB client connected');
     return mongoClient;
   } catch (error) {
@@ -75,9 +75,9 @@ export async function storeTokenDataInMongoDB(
 ): Promise<MongoStorageResult> {
   try {
     console.log(`🔄 Storing token data in MongoDB for ${tokenData.symbol}...`);
-    
+
     const db = await getMongoDatabase();
-    
+
     if (!db) {
       const config = getMongoConfig();
       console.warn('⚠️ MongoDB not configured:', {
@@ -90,10 +90,10 @@ export async function storeTokenDataInMongoDB(
     }
 
     const tokensCollection: Collection = db.collection('tokens');
-    
+
     // Log imageUrl before storing
     console.log(`📸 Storing imageUrl for ${tokenData.symbol}:`, tokenData.imageUrl);
-    
+
     // Insert token data (upsert to handle duplicates)
     const result = await tokensCollection.updateOne(
       { mint_address: tokenData.mintAddress },
@@ -123,12 +123,12 @@ export async function storeTokenDataInMongoDB(
     );
 
     console.log(`✅ Token data stored in MongoDB: ${tokenData.mintAddress}, imageUrl: ${tokenData.imageUrl || 'NOT SET'}`);
-    
+
     return {
       success: true,
       id: tokenData.id,
     };
-    
+
   } catch (error) {
     console.error('❌ Error storing token data in MongoDB:', error);
     return {
@@ -150,9 +150,9 @@ export async function storeCreatorWalletInMongoDB(
 ): Promise<MongoStorageResult> {
   try {
     console.log(`🔄 Storing creator wallet in MongoDB: ${walletAddress}...`);
-    
+
     const db = await getMongoDatabase();
-    
+
     if (!db) {
       return {
         success: false,
@@ -161,7 +161,7 @@ export async function storeCreatorWalletInMongoDB(
     }
 
     const creatorsCollection: Collection = db.collection('creators');
-    
+
     // Update creator record (upsert to handle new creators)
     const result = await creatorsCollection.updateOne(
       { wallet_address: walletAddress },
@@ -191,12 +191,12 @@ export async function storeCreatorWalletInMongoDB(
     }
 
     console.log(`✅ Creator wallet stored in MongoDB: ${walletAddress}`);
-    
+
     return {
       success: true,
       id: walletAddress,
     };
-    
+
   } catch (error) {
     console.error('❌ Error storing creator wallet in MongoDB:', error);
     return {
@@ -216,7 +216,7 @@ export async function getTokenDataFromMongoDB(
 ): Promise<TokenData | null> {
   try {
     const db = await getMongoDatabase();
-    
+
     if (!db) {
       return null;
     }
@@ -288,7 +288,7 @@ export async function getCreatorDataFromMongoDB(
 } | null> {
   try {
     const db = await getMongoDatabase();
-    
+
     if (!db) {
       return null;
     }
@@ -313,7 +313,7 @@ export async function listTokensFromMongoDB(
 ): Promise<TokenData[]> {
   try {
     const db = await getMongoDatabase();
-    
+
     if (!db) {
       return [];
     }
@@ -376,7 +376,7 @@ export async function listTokensFromMongoDB(
 export async function getAllCreatorsFromMongoDB(): Promise<string[]> {
   try {
     const db = await getMongoDatabase();
-    
+
     if (!db) {
       return [];
     }
@@ -401,7 +401,7 @@ export async function getAllCreatorsFromMongoDB(): Promise<string[]> {
 export async function testMongoDBConnection(): Promise<boolean> {
   try {
     const db = await getMongoDatabase();
-    
+
     if (!db) {
       console.error('❌ MongoDB not configured');
       return false;
@@ -409,7 +409,7 @@ export async function testMongoDBConnection(): Promise<boolean> {
 
     // Test by pinging the database
     await db.admin().ping();
-    
+
     console.log('✅ MongoDB connection successful');
     return true;
   } catch (error) {
