@@ -29,6 +29,33 @@ const orbitron = Orbitron({
 export const metadata: Metadata = {
   title: 'MemeHaus - Memecoin Launchpad',
   description: 'MemeHaus is your all-in-one Solana hub — create, trade, stake, and explore the blockchain faster than Doc Brown\'s DeLorean. Roads? Where we\'re going, we don\'t need roads.',
+  icons: {
+    icon: '/favicon.png',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.png',
+  },
+  openGraph: {
+    title: 'MemeHaus - Memecoin Launchpad',
+    description: 'The premier Solana launchpad for memecoins. Create, trade, and stake with 10% community rewards.',
+    url: 'https://memehaus.vercel.app',
+    siteName: 'MemeHaus',
+    images: [
+      {
+        url: 'https://memehaus.vercel.app/favicon.png',
+        width: 512,
+        height: 512,
+        alt: 'MemeHaus Logo',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MemeHaus - Memecoin Launchpad',
+    description: 'Create, trade, and stake memecoins on Solana with community rewards.',
+    images: ['https://memehaus.vercel.app/favicon.png'],
+  },
 }
 
 export default function RootLayout({

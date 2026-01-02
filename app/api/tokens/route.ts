@@ -19,7 +19,7 @@ async function enrichTokenWithOnChainData(token: TokenFromAPI): Promise<TokenFro
 
   try {
     const onChainData = await fetchTokenMetadataFromChain(mintAddress);
-    
+
     if (onChainData && onChainData.name !== 'Unknown Token' && onChainData.symbol !== 'UNK') {
       return {
         ...token,
@@ -46,10 +46,10 @@ export async function GET(request: NextRequest) {
 
     // MongoDB-only storage - no GitHub fallback
     let allTokens: TokenFromAPI[] = [];
-    
+
     try {
       allTokens = await listTokensFromMongoDB(100); // Get more tokens than needed for pagination
-      
+
       if (allTokens && allTokens.length > 0) {
         console.log(`API: Fetched ${allTokens.length} tokens from MongoDB`);
       } else {
@@ -61,16 +61,16 @@ export async function GET(request: NextRequest) {
       // Return empty array instead of throwing - allows UI to continue working
       allTokens = [];
     }
-    
+
     // Apply pagination
     const startIndex = page * limit;
     const endIndex = startIndex + limit;
     const tokens = allTokens.slice(startIndex, endIndex);
-    
+
     // Enrich tokens with on-chain metadata if missing name/symbol
     // Only enrich first few tokens to avoid rate limits, and limit concurrency
     const tokensToEnrich = tokens.slice(0, Math.min(10, tokens.length));
-    
+
     // Enrich with limited concurrency to avoid rate limits
     const enrichedTokens: TokenFromAPI[] = [];
     for (let i = 0; i < tokensToEnrich.length; i++) {
@@ -86,12 +86,20 @@ export async function GET(request: NextRequest) {
         enrichedTokens.push(tokensToEnrich[i]); // Use original token if enrichment fails
       }
     }
-    
+
     const remainingTokens = tokens.slice(tokensToEnrich.length);
     const allEnrichedTokens = [...enrichedTokens, ...remainingTokens];
-    
+
+    // Filter out tokens with missing metadata ('Unknown Token' or 'UNK')
+    const filteredTokens = allEnrichedTokens.filter((token: TokenFromAPI) =>
+      token.name &&
+      token.symbol &&
+      token.name !== 'Unknown Token' &&
+      token.symbol !== 'UNK'
+    );
+
     // Ensure tokens have both camelCase and snake_case for frontend compatibility
-    const tokensWithBothFormats = allEnrichedTokens.map(token => {
+    const tokensWithBothFormats = filteredTokens.map((token: TokenFromAPI) => {
       // Log imageUrl for debugging
       if (!token.imageUrl) {
         console.warn(`⚠️ Token ${token.symbol} (${token.mintAddress}) has no imageUrl`);
@@ -113,8 +121,8 @@ export async function GET(request: NextRequest) {
         created_at: token.createdAt,
       };
     });
-    
-    console.log(`API: Returning ${tokensWithBothFormats.length} tokens from MongoDB (page ${page}, limit ${limit})`);
+
+    console.log(`API: Returning ${tokensWithBothFormats.length} tokens from MongoDB (page ${page}, limit ${limit}) after filtering`);
 
     // Calculate platform stats
     const stats = {
@@ -122,7 +130,7 @@ export async function GET(request: NextRequest) {
       totalVolume: '0', // We don't track volume yet
       totalUsers: new Set(allTokens.map(token => token.creatorWallet || token.creator_wallet)).size
     };
-    
+
     console.log('API: Platform stats:', stats);
 
     return NextResponse.json({
@@ -139,7 +147,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('API: Error fetching tokens from MongoDB:', error);
-    
+
     // Return empty result gracefully - allows UI to continue working
     return NextResponse.json({
       success: true,

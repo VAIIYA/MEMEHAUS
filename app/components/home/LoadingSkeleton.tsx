@@ -6,27 +6,29 @@ interface LoadingSkeletonProps {
   count?: number;
 }
 
-export const LoadingSkeleton = memo<LoadingSkeletonProps>(({ count = 4 }) => {
+export const LoadingSkeleton = memo<LoadingSkeletonProps>(({ count = 8 }) => {
   return (
     <>
       {Array.from({ length: count }).map((_, index) => (
-        <div 
+        <div
           key={index}
-          className="bg-black/30 backdrop-blur-sm p-6 rounded-xl border border-gray-700/50 animate-pulse"
+          className="bg-black/40 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-0 overflow-hidden animate-pulse"
         >
-          <div className="flex flex-col md:flex-row md:items-center justify-between space-y-4 md:space-y-0">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gray-700 rounded-full"></div>
-              <div>
-                <div className="h-6 bg-gray-700 rounded w-32 mb-2"></div>
-                <div className="h-4 bg-gray-700 rounded w-20"></div>
-              </div>
+          {/* Image Placeholder */}
+          <div className="w-full aspect-square bg-gray-800/50"></div>
+
+          {/* Info Placeholder */}
+          <div className="p-5">
+            <div className="h-6 bg-gray-700 rounded w-3/4 mb-2"></div>
+            <div className="h-4 bg-gray-700 rounded w-1/4 mb-4"></div>
+
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="h-12 bg-gray-800/50 rounded-lg"></div>
+              <div className="h-12 bg-gray-800/50 rounded-lg"></div>
             </div>
-            <div className="flex flex-wrap items-center gap-6">
-              <div className="h-4 bg-gray-700 rounded w-16"></div>
-              <div className="h-4 bg-gray-700 rounded w-16"></div>
-              <div className="h-4 bg-gray-700 rounded w-16"></div>
-              <div className="h-4 bg-gray-700 rounded w-16"></div>
+
+            <div className="border-t border-gray-700/50 pt-3">
+              <div className="h-4 bg-gray-700 rounded w-1/2"></div>
             </div>
           </div>
         </div>
