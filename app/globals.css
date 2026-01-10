@@ -6,6 +6,21 @@
   :root {
     --font-inter: 'Inter', sans-serif;
     --font-orbitron: 'Orbitron', monospace;
+
+    /* Sexy Nightstudio-inspired color scheme */
+    --neon-pink: #ff0080;
+    --neon-purple: #8000ff;
+    --neon-blue: #0080ff;
+    --neon-cyan: #00ffff;
+    --deep-purple: #1a0033;
+    --dark-purple: #0f0f23;
+    --midnight-blue: #0a0a1a;
+    --electric-pink: #ff1493;
+    --electric-purple: #9932cc;
+    --electric-blue: #4169e1;
+    --gradient-sexy: linear-gradient(135deg, #ff0080, #8000ff, #0080ff);
+    --gradient-night: linear-gradient(to bottom, #0a0a1a, #1a0033, #0f0f23);
+    --gradient-card: linear-gradient(135deg, rgba(255, 0, 128, 0.1), rgba(128, 0, 255, 0.1), rgba(0, 128, 255, 0.1));
   }
   
   html {
@@ -129,13 +144,62 @@
     @apply text-purple-400;
   }
   
-  .text-neon-pink {
-    @apply text-pink-400;
-  }
-  
-  .text-neon-cyan {
-    @apply text-cyan-400;
-  }
+   .text-neon-pink {
+     @apply text-pink-400;
+   }
+
+   .text-neon-cyan {
+     @apply text-cyan-400;
+   }
+
+   /* Sexy new color classes */
+   .text-electric-pink {
+     color: var(--electric-pink);
+   }
+
+   .text-electric-purple {
+     color: var(--electric-purple);
+   }
+
+   .text-electric-blue {
+     color: var(--electric-blue);
+   }
+
+   .text-deep-purple {
+     color: var(--deep-purple);
+   }
+
+   .text-midnight-blue {
+     color: var(--midnight-blue);
+   }
+
+   .bg-gradient-sexy {
+     background: var(--gradient-sexy);
+   }
+
+   .bg-gradient-night {
+     background: var(--gradient-night);
+   }
+
+   .bg-gradient-card {
+     background: var(--gradient-card);
+   }
+
+   .shadow-glow-pink {
+     box-shadow: 0 0 20px rgba(255, 20, 147, 0.3);
+   }
+
+   .shadow-glow-purple {
+     box-shadow: 0 0 20px rgba(153, 50, 204, 0.3);
+   }
+
+   .shadow-glow-blue {
+     box-shadow: 0 0 20px rgba(65, 105, 225, 0.3);
+   }
+
+   .shadow-glow-sexy {
+     box-shadow: 0 0 30px rgba(255, 0, 128, 0.4), 0 0 60px rgba(128, 0, 255, 0.3), 0 0 90px rgba(0, 128, 255, 0.2);
+   }
   
   .bg-card {
     @apply bg-gray-800;

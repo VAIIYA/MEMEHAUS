@@ -233,7 +233,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900 text-white mobile-container w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-night text-white mobile-container w-full max-w-full overflow-x-hidden">
       <WalletNotification />
       {/* Header */}
       <header className="px-4 py-6 md:px-8">
@@ -274,17 +274,20 @@ export default function Home() {
             <Link href="/autostake" className="text-gray-300 hover:text-white transition-colors font-inter font-medium">
               Auto-Stake
             </Link>
-            <Link href="/profile" className="text-gray-300 hover:text-white transition-colors font-inter font-medium">
-              Profile
-            </Link>
-            <a 
-              href="https://luckyhaus.vercel.app/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-gray-300 hover:text-white transition-colors font-inter font-medium"
-            >
-              LuckyHaus
-            </a>
+             <Link href="/profile" className="text-gray-300 hover:text-white transition-colors font-inter font-medium">
+               Profile
+             </Link>
+             <Link href="/about" className="text-gray-300 hover:text-white transition-colors font-inter font-medium">
+               About
+             </Link>
+             <a
+               href="https://luckyhaus.vercel.app/"
+               target="_blank"
+               rel="noopener noreferrer"
+               className="text-gray-300 hover:text-white transition-colors font-inter font-medium"
+             >
+               LuckyHaus
+             </a>
             <a 
               href="https://x.com/i/communities/1955936302764855712" 
               target="_blank" 
@@ -320,18 +323,21 @@ export default function Home() {
               <Link href="/autostake" className="text-gray-300 hover:text-white transition-colors font-inter font-medium py-2" onClick={() => setMobileMenuOpen(false)}>
                 Auto-Stake
               </Link>
-              <Link href="/profile" className="text-gray-300 hover:text-white transition-colors font-inter font-medium py-2" onClick={() => setMobileMenuOpen(false)}>
-                Profile
-              </Link>
-              <a 
-                href="https://luckyhaus.vercel.app/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-300 hover:text-white transition-colors font-inter font-medium py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                LuckyHaus
-              </a>
+               <Link href="/profile" className="text-gray-300 hover:text-white transition-colors font-inter font-medium py-2" onClick={() => setMobileMenuOpen(false)}>
+                 Profile
+               </Link>
+               <Link href="/about" className="text-gray-300 hover:text-white transition-colors font-inter font-medium py-2" onClick={() => setMobileMenuOpen(false)}>
+                 About
+               </Link>
+               <a
+                 href="https://luckyhaus.vercel.app/"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 className="text-gray-300 hover:text-white transition-colors font-inter font-medium py-2"
+                 onClick={() => setMobileMenuOpen(false)}
+               >
+                 LuckyHaus
+               </a>
               <a 
                 href="https://x.com/i/communities/1955936302764855712" 
                 target="_blank" 
@@ -353,10 +359,10 @@ export default function Home() {
       <section className="px-4 py-16 md:px-8 md:py-24">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-orbitron font-black mb-6 leading-tight">
-            <span className="bg-gradient-to-r from-neon-pink via-neon-purple to-neon-blue bg-clip-text text-transparent animate-pulse">
-              MemeHaus
-            </span>
-          </h2>
+             <span className="bg-gradient-sexy bg-clip-text text-transparent animate-pulse shadow-glow-sexy">
+               MemeHaus
+             </span>
+           </h2>
           <p className="text-xl md:text-2xl font-inter text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
             The Haus is open.<br />
             Make a meme. Mint a dream.<br />
@@ -364,11 +370,11 @@ export default function Home() {
             Welcome home.
           </p>
           
-          <div className="flex justify-center items-center mb-16">
-            <Link href="/create" className="w-full sm:w-96 px-12 py-4 bg-gradient-to-r from-purple-500 via-purple-600 to-violet-600 rounded-full font-inter font-bold text-lg sm:text-xl hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105 inline-block text-center">
-              Create Token
-            </Link>
-          </div>
+           <div className="flex justify-center items-center mb-16">
+             <Link href="/create" className="w-full sm:w-96 px-12 py-4 bg-gradient-sexy rounded-full font-inter font-bold text-lg sm:text-xl hover:shadow-glow-sexy transition-all duration-300 transform hover:scale-105 inline-block text-center">
+               Create Token
+             </Link>
+           </div>
         </div>
       </section>
 
@@ -442,13 +448,13 @@ export default function Home() {
                 const volume24h = launch.volume24h;
                 
                 return (
-                  <Link
-                    key={index}
-                    href={launch.mintAddress ? `/token/${launch.mintAddress}` : '#'}
-                    className="group bg-black/40 backdrop-blur-sm rounded-2xl border border-gray-700/50 hover:border-neon-blue/50 transition-all duration-300 hover:shadow-2xl hover:shadow-neon-blue/20 cursor-pointer block overflow-hidden"
-                  >
-                    {/* Token Image */}
-                    <div className="relative w-full aspect-square bg-gradient-to-br from-neon-pink/20 via-neon-purple/20 to-neon-blue/20 flex items-center justify-center overflow-hidden">
+                   <Link
+                     key={index}
+                     href={launch.mintAddress ? `/token/${launch.mintAddress}` : '#'}
+                     className="group bg-gradient-card backdrop-blur-sm rounded-2xl border border-gray-700/50 hover:border-electric-pink/50 transition-all duration-300 hover:shadow-glow-pink cursor-pointer block overflow-hidden"
+                   >
+                     {/* Token Image */}
+                     <div className="relative w-full aspect-square bg-gradient-card flex items-center justify-center overflow-hidden">
                       {hasImageUrl ? (
                         <img
                           src={imageUrl}
@@ -547,9 +553,9 @@ export default function Home() {
                 <div className="text-gray-400 font-inter mb-4">
                   No tokens have been created yet. Be the first to launch a memecoin! 🚀
                 </div>
-                <Link href="/create" className="inline-block px-6 py-3 bg-gradient-to-r from-neon-pink to-neon-purple rounded-lg font-inter font-semibold hover:shadow-glow-pink transition-all duration-300">
-                  Create Your First Token
-                </Link>
+                 <Link href="/create" className="inline-block px-6 py-3 bg-gradient-sexy rounded-lg font-inter font-semibold hover:shadow-glow-sexy transition-all duration-300">
+                   Create Your First Token
+                 </Link>
               </div>
             )}
           </div>
@@ -565,24 +571,42 @@ export default function Home() {
           <p className="text-xl text-gray-300 mb-8 font-inter">
             Where jokes print money and every shitpost has liquidity.
           </p>
-          <Link href="/create" className="px-12 py-4 bg-gradient-to-r from-neon-pink via-neon-purple to-neon-blue rounded-full font-inter font-bold text-xl hover:shadow-glow-purple transition-all duration-300 transform hover:scale-105 inline-block">
-            Start Your Journey
-          </Link>
+           <Link href="/create" className="px-12 py-4 bg-gradient-sexy rounded-full font-inter font-bold text-xl hover:shadow-glow-sexy transition-all duration-300 transform hover:scale-105 inline-block">
+             Start Your Journey
+           </Link>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="px-4 py-8 md:px-8 border-t border-gray-700/50">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between">
-          <div className="flex items-center space-x-3 mb-4 md:mb-0">
-            <Zap className="w-6 h-6 text-neon-cyan" />
-            <span className="font-orbitron font-bold text-lg">MemeHaus</span>
-          </div>
-          <div className="text-gray-400 font-inter text-sm text-center md:text-left">
-            © 2025 MemeHaus. It's All a Meme. v2.0
-          </div>
-        </div>
-      </footer>
+       {/* Footer */}
+       <footer className="px-4 py-8 md:px-8 border-t border-gray-700/50">
+         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between">
+           <div className="flex items-center space-x-3 mb-4 md:mb-0">
+             <Zap className="w-6 h-6 text-neon-cyan" />
+             <span className="font-orbitron font-bold text-lg">MemeHaus</span>
+           </div>
+           <div className="flex items-center space-x-6 mb-4 md:mb-0">
+             <Link href="/about" className="text-gray-400 hover:text-electric-pink transition-colors font-inter text-sm">
+               About
+             </Link>
+             <Link href="/privacy" className="text-gray-400 hover:text-electric-pink transition-colors font-inter text-sm">
+               Privacy
+             </Link>
+             <Link href="/terms" className="text-gray-400 hover:text-electric-pink transition-colors font-inter text-sm">
+               Terms
+             </Link>
+           </div>
+           <div className="text-gray-400 font-inter text-sm text-center md:text-left">
+             <a
+               href="https://vaiiya.vercel.app/"
+               target="_blank"
+               rel="noopener noreferrer"
+               className="hover:text-electric-pink transition-colors"
+             >
+               © 2026 VAIIYA. Built on Solana.
+             </a>
+           </div>
+         </div>
+       </footer>
     </div>
   );
 } 
