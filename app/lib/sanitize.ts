@@ -9,14 +9,13 @@ export function sanitizeString(input: string, maxLength: number = 1000): string 
   if (typeof input !== 'string') {
     return '';
   }
-  
+
   return input
     .slice(0, maxLength) // Limit length
     .replace(/[<>\"'&]/g, '') // Remove HTML/XML characters
     .replace(/javascript:/gi, '') // Remove javascript: protocol
     .replace(/data:/gi, '') // Remove data: protocol
     .replace(/vbscript:/gi, '') // Remove vbscript: protocol
-    .trim();
 }
 
 /**
