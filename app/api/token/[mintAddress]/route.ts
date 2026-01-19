@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTokenDataFromMongoDB } from '../../../lib/mongodbStorage';
 import { PriceService } from '../../../services/priceService';
-import { PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 import { fetchTokenMetadataFromChain } from '../../../lib/onChainMetadata';
+import { BondingCurveService } from '../../../services/bondingCurveService';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,8 +22,9 @@ export async function GET(
     }
 
     // Validate mint address format
+    let mintPubkey: PublicKey;
     try {
-      new PublicKey(mintAddress);
+      mintPubkey = new PublicKey(mintAddress);
     } catch {
       return NextResponse.json(
         { success: false, error: 'Invalid Solana address format' },
@@ -39,7 +41,7 @@ export async function GET(
     if (!tokenData || !tokenData.name || !tokenData.symbol || tokenData.name === 'Unknown Token' || tokenData.symbol === 'UNK') {
       console.log('API: Token not in MongoDB or missing metadata, fetching from on-chain...');
       const onChainData = await fetchTokenMetadataFromChain(mintAddress);
-      
+
       if (onChainData) {
         // Merge on-chain data with MongoDB data (if exists) or create new token data
         tokenData = {
@@ -70,14 +72,42 @@ export async function GET(
       }
     }
 
-    // Get current price and market data (non-blocking - continue even if price fetch fails)
-    let priceData = null;
+    // Get current price and market data
+    let priceData = { price: 0, priceChange24h: 0, volume24h: 0 };
+    let bondingCurveData = null;
+
     try {
-      const priceService = new PriceService();
-      priceData = await priceService.getTokenPrice(mintAddress);
+      // 1. Try Bonding Curve first
+      const endpoint = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
+      const connection = new Connection(endpoint, 'confirmed');
+      const bondingCurveService = new BondingCurveService(connection);
+
+      try {
+        const curveState = await bondingCurveService.getCurveState(mintPubkey);
+        if (curveState && !curveState.complete) {
+          const currentPrice = bondingCurveService.getCurrentPrice(curveState);
+          priceData.price = currentPrice;
+          bondingCurveData = {
+            complete: false,
+            liquidtyVaultSol: curveState.realSolReserves.toString(),
+            liquidtyVaultTokens: curveState.realTokenReserves.toString(),
+            progress: (Number(curveState.realSolReserves) / Number(BondingCurveService.SOL_GRADUATION_TARGET)) * 100
+          };
+        }
+      } catch (curveError: any) {
+        console.log('API: Token not on bonding curve or error:', curveError.message);
+      }
+
+      // 2. Fallback to Jupiter if not on bonding curve or if price is still 0
+      if (priceData.price === 0) {
+        const priceService = new PriceService();
+        const jupPrice = await priceService.getTokenPrice(mintAddress);
+        if (jupPrice) {
+          priceData = jupPrice;
+        }
+      }
     } catch (priceError) {
-      console.warn('Price fetch failed, continuing without price data:', priceError);
-      // Continue without price - token data is still valid
+      console.warn('API: Price fetch failed:', priceError);
     }
 
     // Get holder count
@@ -86,17 +116,19 @@ export async function GET(
       const holdersResponse = await fetch(
         `${request.nextUrl.origin}/api/token/holders?mintAddress=${mintAddress}`
       );
-      const holdersData = await holdersResponse.json();
-      if (holdersData.success && holdersData.holders !== undefined) {
-        holders = holdersData.holders;
+      if (holdersResponse.ok) {
+        const holdersData = await holdersResponse.json();
+        if (holdersData.success && holdersData.holders !== undefined) {
+          holders = holdersData.holders;
+        }
       }
     } catch (error) {
-      console.error('Error fetching holders:', error);
+      console.error('API: Error fetching holders:', error);
     }
 
-    // Calculate market cap if price is available
+    // Calculate market cap
     let marketCap = 0;
-    if (priceData && priceData.price > 0) {
+    if (priceData.price > 0) {
       const supply = parseFloat(tokenData.totalSupply);
       marketCap = supply * priceData.price;
     }
@@ -106,7 +138,6 @@ export async function GET(
       success: true,
       token: {
         ...tokenData,
-        // Add both formats for compatibility
         mint_address: tokenData.mintAddress,
         total_supply: tokenData.totalSupply,
         creator_wallet: tokenData.creatorWallet,
@@ -120,15 +151,15 @@ export async function GET(
         fee_transaction_signature: tokenData.feeTransactionSignature,
         created_at: tokenData.createdAt,
         // Market data
-        price: priceData?.price || 0,
-        priceChange24h: priceData?.priceChange24h || 0,
-        volume24h: priceData?.volume24h || 0,
+        price: priceData.price,
+        priceChange24h: priceData.priceChange24h,
+        volume24h: priceData.volume24h,
         marketCap: marketCap,
         holders: holders,
+        bondingCurve: bondingCurveData
       },
     };
 
-    console.log('API: Token data fetched successfully');
     return NextResponse.json(response);
   } catch (error) {
     console.error('API: Error fetching token data:', error);

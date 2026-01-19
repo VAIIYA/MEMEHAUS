@@ -5,7 +5,7 @@ import { Connection, PublicKey, Keypair } from '@solana/web3.js';
 jest.mock('@solana/web3.js');
 jest.mock('@solana/spl-token');
 jest.mock('@metaplex-foundation/mpl-token-metadata');
-jest.mock('../../app/lib/githubOnlyStorage');
+// githubOnlyStorage mock removed
 
 describe('CreateTokenService', () => {
   let service: CreateTokenService;

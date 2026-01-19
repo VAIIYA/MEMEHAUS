@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getTokenDataFromMongoDB } from '../../../lib/mongodbStorage';
-import { TokenMetadata } from '../../../lib/types';
+import { getTokenDataFromMongoDB } from '../../../../lib/mongodbStorage';
+import { TokenMetadata } from '../../../../lib/types';
 
 export const dynamic = 'force-dynamic';
 

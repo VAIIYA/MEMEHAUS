@@ -1,11 +1,11 @@
 import { Connection, PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
-import { 
-  getAssociatedTokenAddress, 
-  createTransferInstruction, 
+import {
+  getAssociatedTokenAddress,
+  createTransferInstruction,
   TOKEN_PROGRAM_ID,
   getOrCreateAssociatedTokenAccount
 } from '@solana/spl-token';
-import { TokenData } from '../lib/githubOnlyStorage';
+// TokenData import removed as it was unused and the source file no longer exists
 import { getAllCreatorsFromMongoDB } from '../lib/mongodbStorage';
 
 export interface CommunityFeeDistribution {
@@ -42,17 +42,17 @@ export class CommunityFeeService {
   async getPreviousCreators(excludeWallet?: string): Promise<string[]> {
     try {
       console.log('📋 Fetching previous token creators from MongoDB...');
-      
+
       // Get all creators from MongoDB
       const allCreators = await getAllCreatorsFromMongoDB();
-      
+
       // Filter out excluded wallet
-      const previousCreators = excludeWallet 
+      const previousCreators = excludeWallet
         ? allCreators.filter(addr => addr !== excludeWallet)
         : allCreators;
-      
+
       console.log(`✅ Found ${previousCreators.length} unique previous creators`);
-      
+
       return previousCreators;
     } catch (error) {
       console.error('❌ Error fetching previous creators from MongoDB:', error);
@@ -83,12 +83,12 @@ export class CommunityFeeService {
       // Split equally among all previous creators
       const sharePerCreator = totalCommunityFee / BigInt(previousCreators.length);
       const remainder = totalCommunityFee % BigInt(previousCreators.length);
-      
+
       const distributions: CommunityFeeDistribution[] = previousCreators.map((wallet, index) => {
         // Add remainder to first creator to handle rounding
         const amount = index === 0 ? sharePerCreator + remainder : sharePerCreator;
         const share = (100 / previousCreators.length);
-        
+
         return {
           recipientWallet: wallet,
           amount,
@@ -139,7 +139,7 @@ export class CommunityFeeService {
     try {
       // Get previous creators
       const previousCreators = await this.getPreviousCreators(excludeWallet);
-      
+
       if (previousCreators.length === 0) {
         console.log('ℹ️ No previous creators found, skipping distribution');
         return {
@@ -151,7 +151,7 @@ export class CommunityFeeService {
 
       // Calculate distribution
       const distributionResult = this.calculateDistribution(totalCommunityFee, previousCreators);
-      
+
       if (!distributionResult.success) {
         return {
           success: false,
@@ -172,14 +172,14 @@ export class CommunityFeeService {
       // Create transactions (batch into groups of 10 to avoid transaction size limits)
       const transactions: Transaction[] = [];
       const BATCH_SIZE = 10;
-      
+
       for (let i = 0; i < distributionResult.distributions.length; i += BATCH_SIZE) {
         const batch = distributionResult.distributions.slice(i, i + BATCH_SIZE);
         const transaction = new Transaction();
-        
+
         for (const distribution of batch) {
           const recipientWallet = new PublicKey(distribution.recipientWallet);
-          
+
           // Get or create recipient token account
           const recipientTokenAccount = await getOrCreateAssociatedTokenAccount(
             this.connection,

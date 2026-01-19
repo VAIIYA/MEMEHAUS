@@ -95,7 +95,7 @@ export async function uploadMetadata(
     // Upload metadata with fallback providers
     console.log('📤 Uploading metadata with fallback providers...');
     const result = await uploadTokenMetadataWithFallback(metadata, params.symbol);
-    
+
     if (result.success) {
       console.log(`✅ Metadata uploaded successfully with ${result.provider}!`);
       console.log('Metadata URI:', result.url);
@@ -106,10 +106,10 @@ export async function uploadMetadata(
 
   } catch (error) {
     console.error('❌ Failed to upload metadata to Lighthouse.storage:', error);
-    
+
     // Fallback: Create base64-encoded data URI
     console.log('🔄 Falling back to base64 data URI...');
-    
+
     try {
       // Build the same metadata object for fallback
       const fallbackMetadata = {
@@ -176,7 +176,7 @@ export async function uploadMetadata(
 
     } catch (fallbackError) {
       console.error('❌ Fallback data URI creation also failed:', fallbackError);
-      
+
       // Final fallback: minimal metadata
       const minimalMetadata = {
         name: params.name,
@@ -202,13 +202,13 @@ export async function uploadMetadata(
 export async function testLighthouseConnection(): Promise<boolean> {
   try {
     console.log('🔍 Testing storage providers...');
-    
+
     // Test all storage providers
     const storageResults = await testAllStorageProviders();
-    
+
     // Return true if at least one provider is available
-    const hasAvailableProvider = storageResults.lighthouse || storageResults.githubRepo || storageResults.githubGist;
-    
+    const hasAvailableProvider = storageResults.lighthouse;
+
     if (hasAvailableProvider) {
       console.log('✅ At least one storage provider is available');
       return true;
@@ -233,12 +233,12 @@ export async function getMetadataUri(
   creatorWallet: string
 ): Promise<string> {
   console.log('🎯 Getting metadata URI for token:', params.symbol);
-  
+
   // Test connection first
   const isConnected = await testLighthouseConnection();
   if (!isConnected) {
     console.log('⚠️ Lighthouse connection failed, using fallback');
   }
-  
+
   return await uploadMetadata(params, creatorWallet);
 }
