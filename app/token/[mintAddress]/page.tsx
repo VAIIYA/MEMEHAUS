@@ -73,11 +73,11 @@ export default function TokenPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0d0e12] text-white">
+      <div className="min-h-screen bg-white text-metamask-purple">
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-neon-cyan mb-4"></div>
-            <p className="text-gray-400">Loading token details...</p>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-metamask-orange mb-4"></div>
+            <p className="text-gray-500 font-metamask">Loading token details...</p>
           </div>
         </div>
       </div>
@@ -86,14 +86,14 @@ export default function TokenPage() {
 
   if (error || !tokenData) {
     return (
-      <div className="min-h-screen bg-[#0d0e12] text-white">
+      <div className="min-h-screen bg-white text-metamask-purple">
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Token Not Found</h1>
-            <p className="text-gray-400 mb-6">{error}</p>
+            <h1 className="text-3xl font-metamask-heading font-black mb-4">Token Not Found</h1>
+            <p className="text-gray-500 mb-8 max-w-md">{error}</p>
             <Link
               href="/"
-              className="inline-flex items-center space-x-2 px-6 py-3 bg-gray-800 rounded-lg font-semibold hover:bg-gray-700 transition-all"
+              className="inline-flex items-center space-x-2 px-8 py-4 bg-metamask-purple text-white rounded-full font-metamask font-bold hover:bg-purple-900 shadow-lg transition-all"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to Home</span>
@@ -105,36 +105,42 @@ export default function TokenPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0d0e12] text-white">
+    <div className="min-h-screen bg-white text-metamask-purple overflow-x-hidden">
       {/* Header */}
-      <header className="border-b border-gray-800/50 bg-black/40 backdrop-blur-md sticky top-0 z-50">
+      <header className="border-b border-metamask-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-50">
         <div className="px-4 py-4 md:px-8">
           <nav className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link href="/" className="flex items-center space-x-2">
-                <Zap className="w-8 h-8 text-neon-cyan" />
-                <h1 className="text-2xl font-orbitron font-bold text-white">MemeHaus</h1>
+              <Link href="/" className="flex items-center space-x-3 group">
+                <div className="bg-metamask-orange p-2 rounded-xl group-hover:rotate-12 transition-transform shadow-md shadow-orange-500/10">
+                  <Zap className="w-8 h-8 text-white fill-white" />
+                </div>
+                <h1 className="text-2xl font-metamask-heading font-black text-metamask-purple">MemeHaus</h1>
               </Link>
-              <NetworkIndicator />
+              <div className="hidden md:block">
+                <NetworkIndicator />
+              </div>
             </div>
-            <WalletConnectButton />
+            <div className="flex items-center space-x-4">
+              <WalletConnectButton />
+            </div>
           </nav>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-8 md:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
           {/* Left Column - Main Info (8 cols) */}
-          <div className="lg:col-span-8 space-y-6">
+          <div className="lg:col-span-8 space-y-8">
             <div className="flex items-center justify-between">
-              <Link href="/" className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+              <Link href="/" className="flex items-center space-x-2 text-gray-500 hover:text-metamask-orange font-metamask font-bold transition-colors">
                 <ArrowLeft className="w-4 h-4" />
-                <span>Back</span>
+                <span>All Tokens</span>
               </Link>
-              <div className="text-sm font-mono text-neon-cyan bg-neon-cyan/10 px-3 py-1 rounded-full border border-neon-cyan/20">
-                {tokenData.mintAddress}
+              <div className="text-[10px] font-bold text-metamask-orange bg-metamask-orange/10 px-4 py-1.5 rounded-full border border-metamask-orange/20 uppercase tracking-widest shadow-sm">
+                Contract: {tokenData.mintAddress.slice(0, 12)}...
               </div>
             </div>
 
@@ -162,22 +168,28 @@ export default function TokenPage() {
           </div>
 
           {/* Right Column - Trade & Info (4 cols) */}
-          <div className="lg:col-span-4 space-y-6">
+          <div className="lg:col-span-4 space-y-8">
             {/* Bonding Curve Progress */}
             {tokenData.bondingCurve && (
-              <div className="bg-black/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-bold">Bonding Curve Progress</h3>
-                  <span className="text-neon-cyan font-mono">{tokenData.bondingCurve.progress.toFixed(1)}%</span>
+              <div className="bg-white rounded-2xl border border-metamask-gray-100 p-6 shadow-sm relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-metamask-orange opacity-5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform"></div>
+
+                <div className="flex items-center justify-between mb-4 relative z-10">
+                  <h3 className="font-metamask font-black text-metamask-purple">Bonding Curve</h3>
+                  <span className="text-metamask-orange font-metamask-heading font-black text-xl">{tokenData.bondingCurve.progress.toFixed(1)}%</span>
                 </div>
-                <div className="w-full bg-gray-800 rounded-full h-3 mb-4 overflow-hidden">
+
+                <div className="w-full bg-metamask-gray-50 rounded-full h-4 mb-6 overflow-hidden border border-metamask-gray-100 relative z-10">
                   <div
-                    className="bg-gradient-to-r from-neon-cyan to-neon-blue h-full transition-all duration-500 shadow-[0_0_10px_rgba(0,255,255,0.5)]"
+                    className="bg-metamask-orange h-full transition-all duration-1000 shadow-[0_0_15px_rgba(255,92,22,0.3)] relative"
                     style={{ width: `${tokenData.bondingCurve.progress}%` }}
-                  />
+                  >
+                    <div className="absolute top-0 right-0 w-8 h-full bg-white/30 skew-x-[-20deg]"></div>
+                  </div>
                 </div>
-                <p className="text-xs text-gray-400">
-                  When the bonding curve reaches 100%, the liquidity will be migrated to Raydium.
+
+                <p className="text-xs text-gray-500 relative z-10 font-metamask font-medium leading-relaxed">
+                  When the bonding curve reaches 100%, the liquidity will be migrated to Raydium. 🚀
                 </p>
               </div>
             )}
@@ -189,27 +201,27 @@ export default function TokenPage() {
               tokenDecimals={tokenData.decimals || 9}
             />
 
-            <div className="bg-black/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6">
-              <h3 className="font-bold mb-4">About {tokenData.name}</h3>
-              <p className="text-sm text-gray-400 leading-relaxed mb-6">
+            <div className="bg-white rounded-2xl border border-metamask-gray-100 p-8 shadow-sm">
+              <h3 className="text-lg font-metamask-heading font-black text-metamask-purple mb-6">Asset Intelligence</h3>
+              <p className="text-sm text-gray-500 font-metamask font-medium leading-relaxed mb-8">
                 {tokenData.symbol} is a community-driven memecoin launched on MemeHaus.
-                Ownership is renounced and the supply is fixed at 1 Billion tokens.
+                Full ownership has been renounced and the supply is permanently fixed.
               </p>
 
               <div className="space-y-4">
-                <div className="flex justify-between items-center py-2 border-b border-gray-800/50">
-                  <span className="text-sm text-gray-400">Creator</span>
-                  <span className="text-sm font-mono text-neon-cyan">{tokenData.creatorWallet.slice(0, 4)}...{tokenData.creatorWallet.slice(-4)}</span>
+                <div className="flex justify-between items-center py-3 border-b border-metamask-gray-50">
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Creator</span>
+                  <span className="text-sm font-mono font-bold text-metamask-orange">{tokenData.creatorWallet.slice(0, 4)}...{tokenData.creatorWallet.slice(-4)}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-800/50">
-                  <span className="text-sm text-gray-400">Decimals</span>
-                  <span className="text-sm font-mono text-white">{tokenData.decimals || 9}</span>
+                <div className="flex justify-between items-center py-3 border-b border-metamask-gray-50">
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Decimals</span>
+                  <span className="text-sm font-mono font-bold text-metamask-purple">{tokenData.decimals || 9}</span>
                 </div>
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-sm text-gray-400">Network</span>
-                  <span className="text-sm text-white flex items-center">
-                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2" />
-                    Solana Mainnet
+                <div className="flex justify-between items-center py-3">
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Status</span>
+                  <span className="text-sm font-metamask font-bold text-metamask-green flex items-center">
+                    <span className="w-2 h-2 bg-metamask-green rounded-full mr-2 shadow-[0_0_8px_rgba(186,242,74,0.5)]" />
+                    Verified Live
                   </span>
                 </div>
               </div>

@@ -35,13 +35,13 @@ const formatTimeSinceLaunch = (createdAt: string, isMounted: boolean = false): s
   if (!isMounted) {
     return '...';
   }
-  
+
   const now = new Date();
   const created = new Date(createdAt);
   const diffMs = now.getTime() - created.getTime();
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
   const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-  
+
   if (diffHours > 24) {
     const days = Math.floor(diffHours / 24);
     return `${days}d ${diffHours % 24}h`;
@@ -85,22 +85,22 @@ export default function Home() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         console.log('Fetching recent tokens from API...');
-        
+
         // Fetch recent tokens from API - show more tokens like Pump.fun
         const response = await fetch('/api/tokens?page=0&limit=20');
         const data = await response.json();
-        
+
         console.log('API response:', data);
-        
+
         if (data.success && data.tokens && data.tokens.length > 0) {
           // Transform tokens to LaunchItem format
           const launchItems: LaunchItem[] = await Promise.all(data.tokens.map(async (token: any) => {
             console.log('Processing token:', token);
-            
+
             const mintAddress = token.mint_address || token.mintAddress;
-            
+
             // Fetch holder count if mint address is available
             let holders = 0;
             if (mintAddress) {
@@ -114,7 +114,7 @@ export default function Home() {
                 console.error('Error fetching holders:', error);
               }
             }
-            
+
             return {
               name: token.name || 'Unknown Token',
               symbol: token.symbol || 'UNK',
@@ -133,7 +133,7 @@ export default function Home() {
 
           console.log('Transformed launch items:', launchItems);
           setRecentTokens(launchItems);
-          
+
           // Set platform stats from API
           if (data.stats) {
             setPlatformStats(data.stats);
@@ -145,21 +145,21 @@ export default function Home() {
 
       } catch (error) {
         console.error('Error fetching data:', error);
-        
+
         // Try to get tokens from localStorage as fallback
         try {
           if (typeof window !== 'undefined') {
             const storedTokensStr = localStorage.getItem('memehaus_created_tokens');
             console.log('localStorage value:', storedTokensStr);
-            
+
             if (storedTokensStr) {
               const storedTokens = JSON.parse(storedTokensStr);
               console.log('Parsed stored tokens:', storedTokens);
-              
+
               if (Array.isArray(storedTokens) && storedTokens.length > 0) {
                 const fallbackTokens: LaunchItem[] = await Promise.all(storedTokens.slice(0, 20).map(async (token: any) => {
                   const mintAddress = token.mintAddress;
-                  
+
                   // Fetch holder count if mint address is available
                   let holders = 0;
                   if (mintAddress) {
@@ -173,7 +173,7 @@ export default function Home() {
                       console.error('Error fetching holders:', error);
                     }
                   }
-                  
+
                   return {
                     name: token.name || 'Unknown',
                     symbol: token.symbol || 'UNK',
@@ -189,7 +189,7 @@ export default function Home() {
                     volume24h: token.volume24h || 0
                   };
                 }));
-                
+
                 console.log('Using localStorage tokens:', fallbackTokens);
                 setRecentTokens(fallbackTokens);
                 setPlatformStats({
@@ -234,122 +234,89 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-night text-white mobile-container w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-metamask-gray-50 text-metamask-black mobile-container w-full max-w-full overflow-x-hidden">
       <WalletNotification />
       {/* Header */}
-      <header className="px-4 py-6 md:px-8">
+      <header className="px-4 py-8 md:px-8 bg-white border-b border-metamask-gray-100 sticky top-0 z-50 shadow-sm">
         <nav className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-2 md:space-x-3">
-            <Zap className="w-6 h-6 md:w-8 md:h-8 text-neon-cyan" />
-            <h1 className="text-lg md:text-2xl font-orbitron font-bold bg-gradient-to-r from-neon-pink to-neon-blue bg-clip-text text-transparent">
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <Zap className="w-8 h-8 text-metamask-orange" />
+            <h1 className="text-xl md:text-3xl font-metamask-heading font-bold text-metamask-purple tracking-tight">
               MemeHaus
             </h1>
             <div className="hidden sm:block">
               <NetworkIndicator />
             </div>
           </div>
-          
+
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden text-gray-300 hover:text-white transition-colors p-2"
+            className="md:hidden text-metamask-black hover:text-metamask-orange transition-colors p-2"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
-          
+
           {/* Desktop Navigation Menu */}
-          <div className="hidden md:flex items-center space-x-6">
-            <Link href="/" className="text-gray-300 hover:text-white transition-colors font-inter font-medium">
+          <div className="hidden md:flex items-center space-x-8">
+            <Link href="/" className="text-metamask-black hover:text-metamask-orange transition-colors font-metamask font-semibold text-sm">
               Home
             </Link>
-            <Link href="/swap" className="text-gray-300 hover:text-white transition-colors font-inter font-medium">
+            <Link href="/swap" className="text-metamask-black hover:text-metamask-orange transition-colors font-metamask font-semibold text-sm">
               Swap
             </Link>
-            <Link href="/create" className="text-gray-300 hover:text-white transition-colors font-inter font-medium">
+            <Link href="/create" className="text-metamask-black hover:text-metamask-orange transition-colors font-metamask font-semibold text-sm">
               Create
             </Link>
-            <Link href="/liquidity" className="text-gray-300 hover:text-white transition-colors font-inter font-medium">
-              Liquidity
+            <Link href="/profile" className="text-metamask-black hover:text-metamask-orange transition-colors font-metamask font-semibold text-sm">
+              Profile
             </Link>
-            <Link href="/autostake" className="text-gray-300 hover:text-white transition-colors font-inter font-medium">
-              Auto-Stake
-            </Link>
-             <Link href="/profile" className="text-gray-300 hover:text-white transition-colors font-inter font-medium">
-               Profile
-             </Link>
-             <Link href="/about" className="text-gray-300 hover:text-white transition-colors font-inter font-medium">
-               About
-             </Link>
-             <a
-               href="https://luckyhaus.vercel.app/"
-               target="_blank"
-               rel="noopener noreferrer"
-               className="text-gray-300 hover:text-white transition-colors font-inter font-medium"
-             >
-               LuckyHaus
-             </a>
-            <a 
-              href="https://x.com/i/communities/1955936302764855712" 
-              target="_blank" 
+            <a
+              href="https://luckyhaus.vercel.app/"
+              target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-300 hover:text-white transition-colors font-inter font-medium flex items-center space-x-1"
+              className="text-metamask-black hover:text-metamask-orange transition-colors font-metamask font-semibold text-sm"
+            >
+              LuckyHaus
+            </a>
+            <a
+              href="https://x.com/i/communities/1955936302764855712"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-metamask-black hover:text-metamask-orange transition-colors font-metamask font-semibold text-sm flex items-center space-x-1"
             >
               <span>Community</span>
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
             </a>
           </div>
-          
+
           <WalletConnectButton />
         </nav>
-        
+
         {/* Mobile Navigation Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t border-gray-700/50">
-            <div className="flex flex-col space-y-3 pt-4">
-              <Link href="/" className="text-gray-300 hover:text-white transition-colors font-inter font-medium py-2" onClick={() => setMobileMenuOpen(false)}>
+          <div className="md:hidden mt-4 pb-4 border-t border-metamask-gray-100">
+            <div className="flex flex-col space-y-4 pt-6">
+              <Link href="/" className="text-metamask-black hover:text-metamask-orange transition-colors font-metamask font-semibold" onClick={() => setMobileMenuOpen(false)}>
                 Home
               </Link>
-              <Link href="/swap" className="text-gray-300 hover:text-white transition-colors font-inter font-medium py-2" onClick={() => setMobileMenuOpen(false)}>
+              <Link href="/swap" className="text-metamask-black hover:text-metamask-orange transition-colors font-metamask font-semibold" onClick={() => setMobileMenuOpen(false)}>
                 Swap
               </Link>
-              <Link href="/create" className="text-gray-300 hover:text-white transition-colors font-inter font-medium py-2" onClick={() => setMobileMenuOpen(false)}>
+              <Link href="/create" className="text-metamask-black hover:text-metamask-orange transition-colors font-metamask font-semibold" onClick={() => setMobileMenuOpen(false)}>
                 Create
               </Link>
-              <Link href="/liquidity" className="text-gray-300 hover:text-white transition-colors font-inter font-medium py-2" onClick={() => setMobileMenuOpen(false)}>
-                Liquidity
+              <Link href="/profile" className="text-metamask-black hover:text-metamask-orange transition-colors font-metamask font-semibold" onClick={() => setMobileMenuOpen(false)}>
+                Profile
               </Link>
-              <Link href="/autostake" className="text-gray-300 hover:text-white transition-colors font-inter font-medium py-2" onClick={() => setMobileMenuOpen(false)}>
-                Auto-Stake
-              </Link>
-               <Link href="/profile" className="text-gray-300 hover:text-white transition-colors font-inter font-medium py-2" onClick={() => setMobileMenuOpen(false)}>
-                 Profile
-               </Link>
-               <Link href="/about" className="text-gray-300 hover:text-white transition-colors font-inter font-medium py-2" onClick={() => setMobileMenuOpen(false)}>
-                 About
-               </Link>
-               <a
-                 href="https://luckyhaus.vercel.app/"
-                 target="_blank"
-                 rel="noopener noreferrer"
-                 className="text-gray-300 hover:text-white transition-colors font-inter font-medium py-2"
-                 onClick={() => setMobileMenuOpen(false)}
-               >
-                 LuckyHaus
-               </a>
-              <a 
-                href="https://x.com/i/communities/1955936302764855712" 
-                target="_blank" 
+              <a
+                href="https://luckyhaus.vercel.app/"
+                target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-300 hover:text-white transition-colors font-inter font-medium py-2 flex items-center space-x-1"
+                className="text-metamask-black hover:text-metamask-orange transition-colors font-metamask font-semibold"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <span>Community</span>
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
+                LuckyHaus
               </a>
             </div>
           </div>
@@ -357,229 +324,235 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="px-4 py-16 md:px-8 md:py-24">
+      <section className="px-4 py-20 md:px-8 md:py-32 bg-white flex items-center justify-center">
         <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-4xl md:text-6xl lg:text-7xl font-orbitron font-black mb-6 leading-tight">
-             <span className="bg-gradient-sexy bg-clip-text text-transparent animate-pulse shadow-glow-sexy">
-               MemeHaus
-             </span>
-           </h2>
-          <p className="text-xl md:text-2xl font-inter text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-            The Haus is open.<br />
-            Make a meme. Mint a dream.<br />
-            Every mint kicks 10% back to the early Haus degenerates.<br />
-            Welcome home.
+          <div className="mb-6 inline-block bg-metamask-gray-100 rounded-full px-4 py-2 text-metamask-purple font-metamask font-bold text-xs uppercase tracking-widest">
+            Welcome to MemeHaus
+          </div>
+          <h2 className="text-5xl md:text-7xl lg:text-8xl font-metamask-heading font-black mb-8 leading-tight text-metamask-purple">
+            Make a meme.<br />
+            <span className="text-metamask-orange">Mint a dream.</span>
+          </h2>
+          <p className="text-xl md:text-2xl font-metamask text-metamask-black/70 mb-12 max-w-2xl mx-auto leading-relaxed">
+            The Haus is open. Every mint kicks 10% back to the early degenerates. Secure, transparent, and built for the community.
           </p>
-          
-           <div className="flex justify-center items-center mb-16">
-             <Link href="/create" className="w-full sm:w-96 px-12 py-4 bg-gradient-sexy rounded-full font-inter font-bold text-lg sm:text-xl hover:shadow-glow-sexy transition-all duration-300 transform hover:scale-105 inline-block text-center">
-               Create Token
-             </Link>
-           </div>
+
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <Link href="/create" className="w-full sm:w-auto px-10 py-5 bg-metamask-orange hover:bg-orange-600 rounded-full font-metamask font-bold text-lg text-white shadow-lg shadow-orange-500/20 transition-all duration-300 transform hover:-translate-y-1">
+              Start Building
+            </Link>
+            <Link href="/swap" className="w-full sm:w-auto px-10 py-5 border-2 border-metamask-black hover:bg-metamask-gray-50 rounded-full font-metamask font-bold text-lg text-metamask-black transition-all duration-300 transform hover:-translate-y-1">
+              Trade Memes
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="px-4 py-12 md:px-8">
-        <div className="max-w-6xl mx-auto">
+      <section className="px-4 py-16 md:px-8 bg-metamask-gray-50">
+        <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <StatsCard 
-              value={`$${formatLargeNumber(platformStats.totalVolume)}`}
-              label="Total Volume"
-              color="cyan"
-              loading={loading}
-            />
-            <StatsCard 
-              value={platformStats.totalTokens}
-              label="Tokens Launched"
-              color="pink"
-              loading={loading}
-            />
-            <StatsCard 
-              value={platformStats.totalUsers}
-              label="Active Creators"
-              color="purple"
-              loading={loading}
-            />
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-metamask-gray-100 group hover:shadow-md transition-all">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="p-3 bg-blue-50 text-blue-500 rounded-xl">
+                  <TrendingUp className="w-6 h-6" />
+                </div>
+                <div className="text-gray-500 font-semibold uppercase text-xs tracking-wider">Volume</div>
+              </div>
+              <div className="text-3xl font-metamask-heading font-black text-metamask-purple">
+                ${formatLargeNumber(platformStats.totalVolume)}
+              </div>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-metamask-gray-100 group hover:shadow-md transition-all">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="p-3 bg-orange-50 text-metamask-orange rounded-xl">
+                  <Coins className="w-6 h-6" />
+                </div>
+                <div className="text-gray-500 font-semibold uppercase text-xs tracking-wider">Launches</div>
+              </div>
+              <div className="text-3xl font-metamask-heading font-black text-metamask-purple">
+                {platformStats.totalTokens}
+              </div>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-metamask-gray-100 group hover:shadow-md transition-all">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="p-3 bg-green-50 text-green-500 rounded-xl">
+                  <Users className="w-6 h-6" />
+                </div>
+                <div className="text-gray-500 font-semibold uppercase text-xs tracking-wider">Creators</div>
+              </div>
+              <div className="text-3xl font-metamask-heading font-black text-metamask-purple">
+                {platformStats.totalUsers}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Trending Launches - Pump.fun Style */}
-      <section className="px-4 py-16 md:px-8">
+      {/* Recent Launches - MetaMask Style */}
+      <section className="px-4 py-20 md:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
-            <div>
-              <h3 className="text-2xl md:text-3xl font-orbitron font-bold flex items-center space-x-3">
-                <TrendingUp className="w-8 h-8 text-neon-cyan" />
-                <span>Recent Launches</span>
-              </h3>
-              <p className="text-gray-400 text-sm mt-2 font-inter">
-                Latest memecoins created on MemeHaus
-              </p>
-            </div>
+          <div className="mb-12">
+            <h3 className="text-3xl font-metamask-heading font-black text-metamask-purple flex items-center space-x-3">
+              <span>Recent Launches</span>
+            </h3>
+            <p className="text-gray-500 text-sm mt-2 font-metamask font-medium">
+              Latest memecoins created on MemeHaus
+            </p>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {loading ? (
               <>
                 {[...Array(8)].map((_, i) => (
-                  <div key={i} className="bg-black/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 animate-pulse">
-                    <div className="w-20 h-20 bg-gray-700 rounded-full mx-auto mb-4"></div>
-                    <div className="h-4 bg-gray-700 rounded mb-2"></div>
-                    <div className="h-3 bg-gray-700 rounded w-2/3 mx-auto"></div>
+                  <div key={i} className="bg-white rounded-2xl border border-metamask-gray-100 p-6 shadow-sm animate-pulse">
+                    <div className="w-20 h-20 bg-metamask-gray-100 rounded-full mx-auto mb-4"></div>
+                    <div className="h-4 bg-metamask-gray-100 rounded mb-2"></div>
+                    <div className="h-3 bg-metamask-gray-100 rounded w-2/3 mx-auto"></div>
                   </div>
                 ))}
               </>
             ) : recentTokens.length > 0 ? (
               recentTokens.map((launch, index) => {
-                const solscanUrl = launch.mintAddress 
+                const solscanUrl = launch.mintAddress
                   ? `https://solscan.io/token/${launch.mintAddress}`
                   : '#';
-                
+
                 // Get image URL or generate fallback - ensure symbol and name are not null
                 const safeSymbol = launch.symbol || 'UNK';
                 const safeName = launch.name || 'Unknown Token';
                 // Check if imageUrl exists and is not empty
                 const hasImageUrl = launch.imageUrl && launch.imageUrl.trim().length > 0 && !launch.imageUrl.includes('placeholder');
                 const imageUrl = hasImageUrl ? launch.imageUrl : `/api/token-image?symbol=${encodeURIComponent(safeSymbol)}&name=${encodeURIComponent(safeName)}`;
-                
+
                 // Extract optional values for type narrowing
                 const price = launch.price;
                 const volume24h = launch.volume24h;
-                
+
                 return (
-                   <Link
-                     key={index}
-                     href={launch.mintAddress ? `/token/${launch.mintAddress}` : '#'}
-                     className="group bg-gradient-card backdrop-blur-sm rounded-2xl border border-gray-700/50 hover:border-electric-pink/50 transition-all duration-300 hover:shadow-glow-pink cursor-pointer block overflow-hidden"
-                   >
-                     {/* Token Image */}
-                     <div className="relative w-full aspect-square bg-gradient-card flex items-center justify-center overflow-hidden">
+                  <Link
+                    key={index}
+                    href={launch.mintAddress ? `/token/${launch.mintAddress}` : '#'}
+                    className="group bg-white rounded-2xl border border-metamask-gray-100 hover:border-metamask-orange/30 transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer block overflow-hidden"
+                  >
+                    {/* Token Image */}
+                    <div className="relative w-full aspect-square bg-metamask-gray-50 flex items-center justify-center overflow-hidden border-b border-metamask-gray-100">
                       {hasImageUrl ? (
                         <img
                           src={imageUrl}
                           alt={safeName}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           onError={(e) => {
-                            // Fallback to generated image if URL fails
                             const target = e.target as HTMLImageElement;
                             target.src = `/api/token-image?symbol=${encodeURIComponent(safeSymbol)}&name=${encodeURIComponent(safeName)}`;
                           }}
                         />
                       ) : (
-                        <div className="w-24 h-24 bg-gradient-to-br from-neon-pink to-neon-purple rounded-full flex items-center justify-center font-orbitron font-bold text-3xl text-white shadow-lg">
+                        <div className="w-24 h-24 bg-metamask-gray-100 rounded-full flex items-center justify-center font-metamask-heading font-bold text-3xl text-metamask-purple">
                           {safeSymbol[0] || '?'}
                         </div>
                       )}
                       {/* Time badge */}
-                      <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-full text-xs text-gray-300 flex items-center space-x-1">
+                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-metamask-purple shadow-sm flex items-center space-x-1 uppercase tracking-wider">
                         <Clock className="w-3 h-3" />
                         <span>{launch.timeSinceLaunch}</span>
                       </div>
                     </div>
-                    
+
                     {/* Token Info */}
-                    <div className="p-5">
-                      <div className="mb-3">
-                        <h4 className="font-inter font-bold text-lg text-white mb-1 group-hover:text-neon-cyan transition-colors">
+                    <div className="p-6">
+                      <div className="mb-4">
+                        <h4 className="font-metamask font-bold text-lg text-metamask-purple mb-1 group-hover:text-metamask-orange transition-colors">
                           {safeName}
                         </h4>
-                        <p className="text-gray-400 font-mono text-sm">${safeSymbol}</p>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-gray-400 font-mono text-xs">${safeSymbol}</span>
+                          <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                          <span className="text-metamask-green font-bold text-xs">Active</span>
+                        </div>
                       </div>
-                      
+
                       {/* Stats Grid */}
-                      <div className="grid grid-cols-2 gap-3 mb-4">
-                        <div className="bg-gray-800/50 rounded-lg p-2">
-                          <div className="flex items-center space-x-1 mb-1">
-                            <Coins className="w-3 h-3 text-neon-cyan" />
-                            <span className="text-xs text-gray-400">Supply</span>
-                          </div>
-                          <p className="text-sm font-semibold text-white">{launch.totalSupply}</p>
+                      <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Supply</p>
+                          <p className="text-sm font-metamask font-black text-metamask-purple">{launch.totalSupply}</p>
                         </div>
-                        <div className="bg-gray-800/50 rounded-lg p-2">
-                          <div className="flex items-center space-x-1 mb-1">
-                            <Users className="w-3 h-3 text-neon-pink" />
-                            <span className="text-xs text-gray-400">Holders</span>
-                          </div>
-                          <p className="text-sm font-semibold text-white">{launch.holders !== undefined ? launch.holders : launch.distributionRecipients}</p>
+                        <div>
+                          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Holders</p>
+                          <p className="text-sm font-metamask font-black text-metamask-purple">{launch.holders !== undefined ? launch.holders : launch.distributionRecipients}</p>
                         </div>
                       </div>
-                      
+
                       {/* Price/Volume if available */}
                       {(price !== undefined || volume24h !== undefined) && (
-                        <div className="border-t border-gray-700/50 pt-3 space-y-2">
-                          {price !== undefined && price > 0 ? (
-                            <div className="flex justify-between items-center">
-                              <span className="text-xs text-gray-400">Price</span>
-                              <span className="text-sm font-semibold text-neon-cyan">
-                                ${price.toFixed(6)}
-                              </span>
-                            </div>
-                          ) : null}
-                          {volume24h !== undefined && volume24h > 0 ? (
-                            <div className="flex justify-between items-center">
-                              <span className="text-xs text-gray-400">24h Volume</span>
-                              <span className="text-sm font-semibold text-neon-purple">
-                                ${formatLargeNumber(volume24h.toString())}
-                              </span>
-                            </div>
-                          ) : null}
+                        <div className="mb-4 pt-4 border-t border-metamask-gray-50 flex justify-between items-center">
+                          {price !== undefined && price > 0 && (
+                            <span className="text-xs font-metamask font-bold text-metamask-purple">
+                              ${price.toFixed(6)}
+                            </span>
+                          )}
+                          {volume24h !== undefined && volume24h > 0 && (
+                            <span className="text-[10px] font-bold text-gray-400 uppercase">
+                              Vol: ${formatLargeNumber(volume24h.toString())}
+                            </span>
+                          )}
                         </div>
                       )}
-                      
-                      {/* View on Solscan */}
-                      {launch.mintAddress && (
-                        <div className="mt-4 pt-3 border-t border-gray-700/50">
-                          <a
-                            href={solscanUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="flex items-center justify-center space-x-2 text-xs text-gray-400 hover:text-neon-blue transition-colors"
-                          >
-                            <span>View on Solscan</span>
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                          </a>
-                        </div>
-                      )}
+
+                      {/* View Button */}
+                      <div className="mt-4 flex items-center justify-between text-[11px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-metamask-orange transition-colors">
+                        <span>Details</span>
+                        <Zap className="w-3 h-3" />
+                      </div>
                     </div>
                   </Link>
                 );
               })
             ) : (
-              <div className="col-span-full text-center py-12">
-                <div className="text-gray-400 font-inter mb-4">
-                  No tokens have been created yet. Be the first to launch a memecoin! 🚀
+              <div className="col-span-full text-center py-20 bg-white rounded-3xl border border-metamask-gray-100">
+                <div className="text-metamask-purple font-metamask-heading font-bold text-xl mb-4">
+                  No tokens launched yet.
                 </div>
-                 <Link href="/create" className="inline-block px-6 py-3 bg-gradient-sexy rounded-lg font-inter font-semibold hover:shadow-glow-sexy transition-all duration-300">
-                   Create Your First Token
-                 </Link>
+                <p className="text-gray-500 mb-8 max-w-md mx-auto">
+                  Be the first to launch a memecoin on the most secure and community-focused platform on Solana.
+                </p>
+                <Link href="/create" className="inline-block px-10 py-4 bg-metamask-orange text-white rounded-full font-metamask font-bold hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/10">
+                  Create Token
+                </Link>
               </div>
             )}
           </div>
         </div>
       </section>
 
-      {/* CTA Section - Updated for MemeHaus */}
-      <section className="px-4 py-16 md:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <h3 className="text-3xl md:text-4xl font-orbitron font-bold mb-6">
-            Welcome to MemeHaus.
-          </h3>
-          <p className="text-xl text-gray-300 mb-8 font-inter">
-            Where jokes print money and every shitpost has liquidity.
-          </p>
-           <Link href="/create" className="px-12 py-4 bg-gradient-sexy rounded-full font-inter font-bold text-xl hover:shadow-glow-sexy transition-all duration-300 transform hover:scale-105 inline-block">
-             Start Your Journey
-           </Link>
+      {/* CTA Section - MetaMask Style */}
+      <section className="px-4 py-24 md:px-8 bg-white border-t border-metamask-gray-100">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-metamask-purple rounded-[32px] p-12 text-center text-white relative overflow-hidden shadow-2xl">
+            {/* Background decoration */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-metamask-orange rounded-full opacity-10 -mr-32 -mt-32"></div>
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-metamask-green rounded-full opacity-10 -ml-24 -mb-24"></div>
+
+            <h3 className="text-3xl md:text-5xl font-metamask-heading font-black mb-6 relative z-10">
+              Ready to launch your vision?
+            </h3>
+            <p className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto relative z-10 font-metamask">
+              Join thousands of creators who chose MemeHaus for its security, ease of use, and community rewards.
+            </p>
+            <div className="relative z-10">
+              <Link href="/create" className="px-12 py-5 bg-metamask-orange text-white rounded-full font-metamask font-bold text-xl hover:bg-white hover:text-metamask-purple transition-all duration-300 shadow-xl shadow-black/20">
+                Get Started
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
-       {/* Footer */}
-        <Footer />
+      {/* Footer */}
+      <Footer />
     </div>
   );
 } 

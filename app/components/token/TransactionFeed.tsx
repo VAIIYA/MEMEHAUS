@@ -55,38 +55,41 @@ export const TransactionFeed: React.FC<TransactionFeedProps> = ({ mintAddress, t
     };
 
     return (
-        <div className="bg-black/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6">
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold">Recent Transactions</h2>
-                <div className="text-sm text-gray-400">Live Updates</div>
+        <div className="bg-white rounded-2xl border border-metamask-gray-100 p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+                <h2 className="text-xl font-metamask-heading font-black text-metamask-purple">Activity</h2>
+                <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-metamask-green rounded-full animate-pulse"></div>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Live Updates</span>
+                </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
                 {feedItems.map((tx) => (
-                    <div key={tx.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-800/30 border border-gray-700/30 hover:bg-gray-800/50 transition-colors">
-                        <div className="flex items-center space-x-3">
-                            <div className={`p-2 rounded-lg ${tx.type === 'buy' ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
+                    <div key={tx.id} className="flex items-center justify-between p-4 rounded-2xl bg-white border border-metamask-gray-100 hover:border-metamask-orange/30 transition-all group">
+                        <div className="flex items-center space-x-4">
+                            <div className={`p-3 rounded-xl transition-colors ${tx.type === 'buy' ? 'bg-metamask-green/10 text-metamask-green group-hover:bg-metamask-green group-hover:text-white' : 'bg-red-50 text-red-500 group-hover:bg-red-500 group-hover:text-white'}`}>
                                 {tx.type === 'buy' ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownRight className="w-5 h-5" />}
                             </div>
                             <div>
                                 <div className="flex items-center space-x-2">
-                                    <span className={`font-bold ${tx.type === 'buy' ? 'text-green-500' : 'text-red-500'}`}>
+                                    <span className={`font-metamask font-black ${tx.type === 'buy' ? 'text-metamask-green' : 'text-red-500'}`}>
                                         {tx.type === 'buy' ? 'Buy' : 'Sell'}
                                     </span>
-                                    <span className="text-gray-400 text-xs">{tx.timestamp}</span>
+                                    <span className="text-gray-400 text-[10px] font-bold uppercase tracking-wider">{tx.timestamp}</span>
                                 </div>
-                                <div className="text-sm font-mono text-gray-300">
+                                <div className="text-sm font-mono font-bold text-metamask-purple/60">
                                     {formatAddress(tx.user)}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="text-right">
-                            <div className="font-bold">
+                        <div className="flex-1 px-4 text-right">
+                            <div className="font-metamask font-black text-metamask-purple">
                                 {tx.sol.toFixed(2)} SOL
                             </div>
-                            <div className="text-xs text-gray-400">
-                                {tx.amount.toLocaleString()} ${'TOKEN'}
+                            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                {tx.amount.toLocaleString()} Tokens
                             </div>
                         </div>
 
@@ -94,16 +97,16 @@ export const TransactionFeed: React.FC<TransactionFeedProps> = ({ mintAddress, t
                             href={`https://solscan.io/tx/${tx.signature}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+                            className="p-3 bg-metamask-gray-50 hover:bg-metamask-gray-100 rounded-xl transition-all text-gray-400 hover:text-metamask-orange"
                         >
-                            <ExternalLink className="w-4 h-4 text-gray-500" />
+                            <ExternalLink className="w-4 h-4 ml-2" />
                         </a>
                     </div>
                 ))}
             </div>
 
-            <button className="w-full mt-6 py-3 rounded-xl bg-gray-800/50 text-gray-400 text-sm font-semibold hover:bg-gray-800 hover:text-white transition-all">
-                View All Transactions
+            <button className="w-full mt-8 py-4 rounded-full bg-metamask-gray-50 text-gray-400 text-[10px] font-black uppercase tracking-widest hover:bg-metamask-gray-100 hover:text-metamask-purple transition-all border border-metamask-gray-100">
+                View All History
             </button>
         </div>
     );

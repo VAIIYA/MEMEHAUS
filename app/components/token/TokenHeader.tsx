@@ -68,7 +68,7 @@ export const TokenHeader: React.FC<TokenHeaderProps> = ({
     } else {
       date = new Date(dateString);
     }
-    
+
     // Validate date
     if (isNaN(date.getTime())) {
       console.warn('Invalid date string:', dateString);
@@ -87,7 +87,7 @@ export const TokenHeader: React.FC<TokenHeaderProps> = ({
     }
 
     const diffMs = now.getTime() - date.getTime();
-    
+
     // Handle negative or zero differences
     if (diffMs <= 0) {
       return 'Just now';
@@ -116,15 +116,15 @@ export const TokenHeader: React.FC<TokenHeaderProps> = ({
   };
 
   return (
-    <div className="bg-black/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 md:p-8 mb-6">
-      <div className="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-6">
+    <div className="bg-white rounded-2xl border border-metamask-gray-100 p-6 md:p-8 mb-6 shadow-sm">
+      <div className="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-8">
         {/* Token Image */}
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 relative">
           {imageUrl ? (
             <img
               src={imageUrl}
               alt={name}
-              className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-gray-700/50 object-cover"
+              className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-lg object-cover"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';
@@ -133,62 +133,71 @@ export const TokenHeader: React.FC<TokenHeaderProps> = ({
             />
           ) : null}
           <div
-            className={`w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-neon-pink via-neon-purple to-neon-blue rounded-full flex items-center justify-center text-3xl md:text-4xl font-bold text-white border-4 border-gray-700/50 ${
-              imageUrl ? 'hidden' : ''
-            }`}
+            className={`w-24 h-24 md:w-32 md:h-32 bg-metamask-gray-100 rounded-full flex items-center justify-center text-3xl md:text-4xl font-metamask-heading font-bold text-metamask-purple border-4 border-white shadow-lg ${imageUrl ? 'hidden' : ''
+              }`}
           >
             {symbol[0]?.toUpperCase() || '?'}
+          </div>
+          <div className="absolute -bottom-2 -right-2 bg-metamask-green w-8 h-8 rounded-full border-4 border-white flex items-center justify-center shadow-md">
+            <CheckCircle className="w-4 h-4 text-white" />
           </div>
         </div>
 
         {/* Token Info */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between mb-2">
+          <div className="flex items-start justify-between mb-4">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold font-inter mb-1">{name}</h1>
-              <p className="text-xl md:text-2xl text-gray-400 font-mono">${symbol}</p>
+              <h1 className="text-3xl md:text-5xl font-metamask-heading font-black text-metamask-purple mb-1">{name}</h1>
+              <div className="flex items-center space-x-3">
+                <p className="text-xl md:text-2xl text-metamask-orange font-metamask font-bold">{symbol}</p>
+                <div className="bg-metamask-gray-100 px-3 py-1 rounded-full text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                  Verified Contract
+                </div>
+              </div>
             </div>
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => copyToClipboard(mintAddress)}
-                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                className="p-3 bg-metamask-gray-50 hover:bg-metamask-gray-100 text-metamask-purple rounded-xl transition-all shadow-sm"
                 title="Copy mint address"
               >
                 {copied ? (
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <CheckCircle className="w-5 h-5 text-metamask-green" />
                 ) : (
-                  <Copy className="w-5 h-5 text-gray-400" />
+                  <Copy className="w-5 h-5" />
                 )}
               </button>
               <a
                 href={`https://solscan.io/token/${mintAddress}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                className="p-3 bg-metamask-gray-50 hover:bg-metamask-gray-100 text-metamask-purple rounded-xl transition-all shadow-sm"
                 title="View on Solscan"
               >
-                <ExternalLink className="w-5 h-5 text-gray-400" />
+                <ExternalLink className="w-5 h-5" />
               </a>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+          <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 border-t border-metamask-gray-50 pt-4">
             <div className="flex items-center space-x-2">
-              <User className="w-4 h-4" />
-              <span>Created by:</span>
+              <User className="w-4 h-4 text-metamask-purple" />
+              <span className="font-metamask font-medium">Creator:</span>
               <Link
                 href={`/profile`}
-                className="text-neon-cyan hover:text-neon-blue transition-colors font-mono"
+                className="text-metamask-orange hover:underline font-mono font-bold"
               >
                 {formatAddress(creatorWallet)}
               </Link>
             </div>
             <div className="flex items-center space-x-2">
-              <Clock className="w-4 h-4" />
-              <span>{mounted ? formatTimeAgo(createdAt) : '...'}</span>
+              <Clock className="w-4 h-4 text-metamask-purple" />
+              <span className="font-metamask font-medium">{mounted ? formatTimeAgo(createdAt) : '...'}</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="font-mono text-xs">{formatAddress(mintAddress)}</span>
+              <span className="px-3 py-1 bg-metamask-gray-50 rounded-lg font-mono text-xs font-bold text-metamask-purple">
+                {mintAddress.slice(0, 6)}...{mintAddress.slice(-6)}
+              </span>
             </div>
           </div>
         </div>

@@ -60,17 +60,16 @@ export const TokenStats: React.FC<TokenStatsProps> = ({
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
       {/* Price */}
-      <div className="bg-black/30 backdrop-blur-sm rounded-xl border border-gray-700/50 p-4">
+      <div className="bg-white rounded-xl border border-metamask-gray-100 p-4 shadow-sm group hover:border-metamask-orange/30 transition-all">
         <div className="flex items-center space-x-2 mb-2">
-          <DollarSign className="w-4 h-4 text-neon-cyan" />
-          <span className="text-xs text-gray-400">Price</span>
+          <DollarSign className="w-4 h-4 text-metamask-orange" />
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Price</span>
         </div>
-        <div className="text-lg font-bold">{formatPrice(price)}</div>
+        <div className="text-lg font-metamask font-black text-metamask-purple">{formatPrice(price)}</div>
         {priceChange24h !== 0 && (
           <div
-            className={`text-xs mt-1 flex items-center space-x-1 ${
-              priceChange24h >= 0 ? 'text-green-400' : 'text-red-400'
-            }`}
+            className={`text-[10px] mt-1 font-bold flex items-center space-x-1 ${priceChange24h >= 0 ? 'text-metamask-green' : 'text-red-500'
+              }`}
           >
             {priceChange24h >= 0 ? (
               <TrendingUp className="w-3 h-3" />
@@ -86,59 +85,59 @@ export const TokenStats: React.FC<TokenStatsProps> = ({
       </div>
 
       {/* Market Cap */}
-      <div className="bg-black/30 backdrop-blur-sm rounded-xl border border-gray-700/50 p-4">
+      <div className="bg-white rounded-xl border border-metamask-gray-100 p-4 shadow-sm group hover:border-metamask-purple/30 transition-all">
         <div className="flex items-center space-x-2 mb-2">
-          <BarChart3 className="w-4 h-4 text-neon-purple" />
-          <span className="text-xs text-gray-400">Market Cap</span>
+          <BarChart3 className="w-4 h-4 text-metamask-purple" />
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Market Cap</span>
         </div>
-        <div className="text-lg font-bold">{formatValue(marketCap)}</div>
+        <div className="text-lg font-metamask font-black text-metamask-purple">{formatValue(marketCap)}</div>
       </div>
 
       {/* 24h Volume */}
-      <div className="bg-black/30 backdrop-blur-sm rounded-xl border border-gray-700/50 p-4">
+      <div className="bg-white rounded-xl border border-metamask-gray-100 p-4 shadow-sm group hover:border-metamask-orange/30 transition-all">
         <div className="flex items-center space-x-2 mb-2">
-          <BarChart3 className="w-4 h-4 text-neon-pink" />
-          <span className="text-xs text-gray-400">24h Volume</span>
+          <BarChart3 className="w-4 h-4 text-metamask-orange" />
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">24h Volume</span>
         </div>
-        <div className="text-lg font-bold">{formatValue(volume24h)}</div>
+        <div className="text-lg font-metamask font-black text-metamask-purple">{formatValue(volume24h)}</div>
       </div>
 
       {/* 24h Change */}
-      <div className="bg-black/30 backdrop-blur-sm rounded-xl border border-gray-700/50 p-4">
-        <div className="flex items-center space-x-2 mb-2">
+      <div className="bg-white rounded-xl border border-metamask-gray-100 p-4 shadow-sm transition-all overflow-hidden relative">
+        <div className="flex items-center space-x-2 mb-2 relative z-10">
           {priceChange24h >= 0 ? (
-            <TrendingUp className="w-4 h-4 text-green-400" />
+            <TrendingUp className="w-4 h-4 text-metamask-green" />
           ) : (
-            <TrendingDown className="w-4 h-4 text-red-400" />
+            <TrendingDown className="w-4 h-4 text-red-500" />
           )}
-          <span className="text-xs text-gray-400">24h Change</span>
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">24h Change</span>
         </div>
         <div
-          className={`text-lg font-bold ${
-            priceChange24h >= 0 ? 'text-green-400' : 'text-red-400'
-          }`}
+          className={`text-lg font-metamask font-black relative z-10 ${priceChange24h >= 0 ? 'text-metamask-green' : 'text-red-500'
+            }`}
         >
           {priceChange24h >= 0 ? '+' : ''}
           {priceChange24h.toFixed(2)}%
         </div>
+        <div className={`absolute bottom-0 left-0 w-full h-1 ${priceChange24h >= 0 ? 'bg-metamask-green' : 'bg-red-500'} opacity-20`}></div>
       </div>
 
       {/* Holders */}
-      <div className="bg-black/30 backdrop-blur-sm rounded-xl border border-gray-700/50 p-4">
+      <div className="bg-white rounded-xl border border-metamask-gray-100 p-4 shadow-sm group hover:border-metamask-purple/30 transition-all">
         <div className="flex items-center space-x-2 mb-2">
-          <Users className="w-4 h-4 text-neon-cyan" />
-          <span className="text-xs text-gray-400">Holders</span>
+          <Users className="w-4 h-4 text-metamask-purple" />
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Holders</span>
         </div>
-        <div className="text-lg font-bold">{holders.toLocaleString()}</div>
+        <div className="text-lg font-metamask font-black text-metamask-purple">{holders.toLocaleString()}</div>
       </div>
 
       {/* Total Supply */}
-      <div className="bg-black/30 backdrop-blur-sm rounded-xl border border-gray-700/50 p-4">
+      <div className="bg-white rounded-xl border border-metamask-gray-100 p-4 shadow-sm group hover:border-metamask-orange/30 transition-all">
         <div className="flex items-center space-x-2 mb-2">
-          <Coins className="w-4 h-4 text-neon-purple" />
-          <span className="text-xs text-gray-400">Supply</span>
+          <Coins className="w-4 h-4 text-metamask-orange" />
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Supply</span>
         </div>
-        <div className="text-lg font-bold">{formatLargeNumber(totalSupply)}</div>
+        <div className="text-lg font-metamask font-black text-metamask-purple">{formatLargeNumber(totalSupply)}</div>
       </div>
     </div>
   );

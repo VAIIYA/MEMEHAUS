@@ -19,18 +19,22 @@ export const TokenChart: React.FC<TokenChartProps> = ({ mintAddress, initialData
         const chartOptions = {
             layout: {
                 background: { type: ColorType.Solid, color: 'transparent' },
-                textColor: '#9CA3AF',
+                textColor: '#6A737D',
+                fontFamily: 'Euclid Circular B, sans-serif',
             },
             grid: {
-                vertLines: { color: 'rgba(75, 85, 99, 0.2)' },
-                horzLines: { color: 'rgba(75, 85, 99, 0.2)' },
+                vertLines: { color: '#F2F4F6' },
+                horzLines: { color: '#F2F4F6' },
             },
             width: chartContainerRef.current.clientWidth,
             height: 300,
             timeScale: {
-                borderColor: 'rgba(75, 85, 99, 0.5)',
+                borderColor: '#E5E7EB',
                 timeVisible: true,
                 secondsVisible: false,
+            },
+            rightPriceScale: {
+                borderColor: '#E5E7EB',
             },
         };
 
@@ -38,11 +42,11 @@ export const TokenChart: React.FC<TokenChartProps> = ({ mintAddress, initialData
         chartRef.current = chart;
 
         const candlestickSeries = (chart as any).addCandlestickSeries({
-            upColor: '#10B981',
-            downColor: '#EF4444',
+            upColor: '#037DD6',
+            downColor: '#D73A49',
             borderVisible: false,
-            wickUpColor: '#10B981',
-            wickDownColor: '#EF4444',
+            wickUpColor: '#037DD6',
+            wickDownColor: '#D73A49',
         });
         candlestickSeriesRef.current = candlestickSeries;
 
@@ -82,14 +86,16 @@ export const TokenChart: React.FC<TokenChartProps> = ({ mintAddress, initialData
     }, [initialData]);
 
     return (
-        <div className="bg-black/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">Price Chart</h2>
-                <div className="flex space-x-2">
+        <div className="bg-white rounded-2xl border border-metamask-gray-100 p-6 mb-6 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <h2 className="text-xl font-metamask-heading font-black text-metamask-purple">Price Performance</h2>
+                <div className="flex space-x-1 bg-metamask-gray-50 p-1 rounded-full border border-metamask-gray-100">
                     {['1m', '5m', '15m', '1h', '4h', '1d'].map((tf) => (
                         <button
                             key={tf}
-                            className={`px-3 py-1 text-xs rounded-lg font-medium transition-colors ${tf === '1h' ? 'bg-neon-cyan text-black' : 'bg-gray-800 text-gray-400 hover:text-white'
+                            className={`px-4 py-1.5 text-[10px] font-black rounded-full transition-all uppercase tracking-widest ${tf === '1h'
+                                ? 'bg-metamask-purple text-white shadow-sm'
+                                : 'text-gray-400 hover:text-metamask-purple hover:bg-white'
                                 }`}
                         >
                             {tf}

@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Connection, PublicKey, Transaction, Keypair } from '@solana/web3.js';
-import { 
+import {
   getOrCreateAssociatedTokenAccount,
   createTransferInstruction,
+  getAssociatedTokenAddress,
   TOKEN_PROGRAM_ID
 } from '@solana/spl-token';
 import bs58 from 'bs58';
 import { getAllCreatorsFromMongoDB } from '../../../lib/mongodbStorage';
+import { PDAService } from '../../../lib/pdaService';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +18,8 @@ const SERVER_WALLET_ADDRESS = '7UhwWmw1r15fqLKcbYEDVFjqiz2G753MsyDksFAjfT3e';
 
 /**
  * API endpoint to distribute community fees to previous creators
- * This requires server wallet private key to sign transactions
+ * This requires server wallet private key to sign transactions for fees
+ * and derives token-specific vault keys for token movement
  * 
  * POST /api/fees/distribute
  * Body: {
@@ -48,32 +51,54 @@ export async function POST(request: NextRequest) {
     const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
     const connection = new Connection(rpcUrl, 'confirmed');
 
-    // Load server wallet keypair
-    // Support both base58 (native Solana format) and base64 formats
+    // Load server wallet keypair (used for paying GAS fees)
     let serverWalletKeypair: Keypair;
     try {
-      // Try base58 first (native Solana format)
       const privateKeyBytes = bs58.decode(SERVER_WALLET_PRIVATE_KEY);
       serverWalletKeypair = Keypair.fromSecretKey(privateKeyBytes);
-    } catch (base58Error) {
-      // If base58 fails, try base64
+    } catch (e) {
       try {
         const privateKeyBytes = Buffer.from(SERVER_WALLET_PRIVATE_KEY, 'base64');
         serverWalletKeypair = Keypair.fromSecretKey(privateKeyBytes);
-      } catch (base64Error) {
+      } catch (err) {
         return NextResponse.json({
           success: false,
-          error: 'Invalid private key format. Expected base58 or base64 encoded Solana private key.'
+          error: 'Invalid private key format.'
         }, { status: 400 });
       }
     }
-    
-    // Verify the keypair matches the expected public key
-    const serverWallet = new PublicKey(SERVER_WALLET_ADDRESS);
-    if (!serverWalletKeypair.publicKey.equals(serverWallet)) {
+
+    const serverWallet = serverWalletKeypair.publicKey;
+    const tokenMintPubkey = new PublicKey(tokenMint);
+
+    // Derive community vault keypair for this specific token
+    const vaultKeypair = await PDAService.getCommunityVaultKeypair(tokenMintPubkey);
+    const vaultPubKey = vaultKeypair.publicKey;
+
+    // Get vault token account (source of distribution)
+    const vaultTokenAccount = await getAssociatedTokenAddress(
+      tokenMintPubkey,
+      vaultPubKey,
+      false,
+      TOKEN_PROGRAM_ID
+    );
+
+    // Get vault token account balance
+    let availableBalance: bigint;
+    try {
+      const balance = await connection.getTokenAccountBalance(vaultTokenAccount);
+      availableBalance = BigInt(balance.value.amount);
+    } catch (balanceError) {
       return NextResponse.json({
         success: false,
-        error: 'Private key does not match expected server wallet address. Please verify the key is correct.'
+        error: `Vault account for token ${tokenMint} does not exist or has no tokens.`
+      }, { status: 400 });
+    }
+
+    if (availableBalance === BigInt(0)) {
+      return NextResponse.json({
+        success: false,
+        error: 'No community fees available to distribute in this vault'
       }, { status: 400 });
     }
 
@@ -91,50 +116,27 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Get server wallet token account balance
-    const tokenMintPubkey = new PublicKey(tokenMint);
-    const serverTokenAccount = await getOrCreateAssociatedTokenAccount(
-      connection,
-      serverWalletKeypair,
-      tokenMintPubkey,
-      serverWallet
-    );
-
-    // Get current balance
-    const balance = await connection.getTokenAccountBalance(serverTokenAccount.address);
-    const availableBalance = BigInt(balance.value.amount);
-
-    if (availableBalance === BigInt(0)) {
-      return NextResponse.json({
-        success: false,
-        error: 'No community fees available to distribute'
-      }, { status: 400 });
-    }
-
     // Calculate distribution amounts (split equally)
     const amountPerCreator = availableBalance / BigInt(previousCreators.length);
     const remainder = availableBalance % BigInt(previousCreators.length);
 
-    console.log(`📊 Distributing ${availableBalance.toString()} tokens to ${previousCreators.length} creators`);
-    console.log(`   Amount per creator: ${amountPerCreator.toString()}`);
+    console.log(`📊 Distributing ${availableBalance.toString()} from vault ${vaultPubKey.toBase58()} to ${previousCreators.length} creators`);
 
     // Create distribution transactions (batch into groups)
-    const BATCH_SIZE = 10;
+    const BATCH_SIZE = 5; // Smaller batch to ensure we stay under transaction size limits
     const distributionResults = [];
-    
+
     for (let i = 0; i < previousCreators.length; i += BATCH_SIZE) {
       const batch = previousCreators.slice(i, i + BATCH_SIZE);
       const transaction = new Transaction();
-      
+
       for (let j = 0; j < batch.length; j++) {
         const creatorWallet = new PublicKey(batch[j]);
-        
-        // Calculate amount (add remainder to first creator in first batch)
-        const amount = (i === 0 && j === 0) 
-          ? amountPerCreator + remainder 
-          : amountPerCreator;
-        
-        // Get or create recipient token account
+
+        const amount = (i === 0 && j === 0) ? amountPerCreator + remainder : amountPerCreator;
+        if (amount === BigInt(0)) continue;
+
+        // Get or create recipient token account (paid by server wallet)
         const recipientTokenAccount = await getOrCreateAssociatedTokenAccount(
           connection,
           serverWalletKeypair,
@@ -142,12 +144,12 @@ export async function POST(request: NextRequest) {
           creatorWallet
         );
 
-        // Add transfer instruction
+        // Transfer from vault to recipient
         transaction.add(
           createTransferInstruction(
-            serverTokenAccount.address,
+            vaultTokenAccount,
             recipientTokenAccount.address,
-            serverWallet, // Owner (server wallet)
+            vaultPubKey, // Owner
             amount,
             [],
             TOKEN_PROGRAM_ID
@@ -155,11 +157,14 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Sign and send transaction
+      if (transaction.instructions.length === 0) continue;
+
       const { blockhash } = await connection.getLatestBlockhash('confirmed');
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = serverWallet;
-      transaction.sign(serverWalletKeypair);
+
+      // Vault signs for token movement, Server Wallet signs for gas fees
+      transaction.sign(vaultKeypair, serverWalletKeypair);
 
       const signature = await connection.sendRawTransaction(transaction.serialize(), {
         skipPreflight: false,
@@ -167,22 +172,18 @@ export async function POST(request: NextRequest) {
         maxRetries: 3,
       });
 
-      // Wait for confirmation
       await connection.confirmTransaction(signature, 'confirmed');
 
       distributionResults.push({
         transactionSignature: signature,
         recipients: batch,
-        amountPerRecipient: amountPerCreator.toString(),
-        totalAmount: (amountPerCreator * BigInt(batch.length) + (i === 0 ? remainder : BigInt(0))).toString()
+        amount: (amountPerCreator * BigInt(batch.length) + (i === 0 ? remainder : BigInt(0))).toString()
       });
-
-      console.log(`✅ Distribution batch ${Math.floor(i / BATCH_SIZE) + 1} completed: ${signature}`);
     }
 
     return NextResponse.json({
       success: true,
-      message: `Distributed fees to ${previousCreators.length} creators`,
+      message: `Distributed fees from vault to ${previousCreators.length} creators`,
       totalRecipients: previousCreators.length,
       totalAmount: availableBalance.toString(),
       distributions: distributionResults
