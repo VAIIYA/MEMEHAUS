@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { listTokensFromMongoDB } from '../../lib/mongodbStorage';
+import { listTokens } from '../../lib/unifiedStorage';
 import { TokenFromAPI } from '../../types/token';
 import { fetchTokenMetadataFromChain } from '../../lib/onChainMetadata';
 
@@ -42,22 +42,22 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '0');
     const limit = parseInt(searchParams.get('limit') || '10');
 
-    console.log('API: Fetching tokens from MongoDB (page:', page, 'limit:', limit, ')');
+    console.log('API: Fetching tokens from unified storage (page:', page, 'limit:', limit, ')');
 
-    // MongoDB-only storage - no GitHub fallback
+    // Unified storage - MongoDB primary + Turso fallback
     let allTokens: TokenFromAPI[] = [];
 
     try {
-      allTokens = await listTokensFromMongoDB(100); // Get more tokens than needed for pagination
+      allTokens = await listTokens(100) as TokenFromAPI[]; // Get more tokens than needed for pagination
 
       if (allTokens && allTokens.length > 0) {
-        console.log(`API: Fetched ${allTokens.length} tokens from MongoDB`);
+        console.log(`API: Fetched ${allTokens.length} tokens from unified storage`);
       } else {
-        console.log('API: MongoDB returned no tokens (this is normal if no tokens have been created yet)');
+        console.log('API: Unified storage returned no tokens (this is normal if no tokens have been created yet)');
         allTokens = []; // Return empty array instead of throwing
       }
-    } catch (mongoError) {
-      console.error('API: MongoDB fetch failed:', mongoError);
+    } catch (storageError) {
+      console.error('API: Unified storage fetch failed:', storageError);
       // Return empty array instead of throwing - allows UI to continue working
       allTokens = [];
     }

@@ -12,10 +12,12 @@
     "test:coverage": "jest --coverage",
     "test:fee-distribution": "tsx scripts/test-fee-distribution.ts",
     "test:fee-distribution-api": "tsx scripts/test-fee-distribution-api.ts",
-    "test:storage": "tsx scripts/test-storage-connections.ts",
-    "generate-vault-seed": "tsx scripts/generate-vault-seed.ts"
+    "test:storage": "tsx scripts/test-storage-connections.ts.ts",
+    "generate-vault-seed": "tsx scripts/generate-vault-seed.ts",
+    "init:turso": "tsx scripts/initialize-turso.ts"
   },
   "dependencies": {
+    "@libsql/client": "^0.14.0",
     "@lighthouse-web3/sdk": "^0.4.1",
     "@metaplex-foundation/js": "^0.19.5",
     "@metaplex-foundation/mpl-token-metadata": "2.13.0",

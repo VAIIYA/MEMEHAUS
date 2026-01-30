@@ -559,11 +559,37 @@ export class CreateTokenService {
       console.log('  9. Create metadata account');
       console.log('  10. Revoke mint authority');
 
-      const signedMintTransaction = await wallet.signTransaction(mintTransaction);
+      // Sign transaction with enhanced error handling
+      let signedMintTransaction;
+      try {
+        console.log('Requesting wallet signature...');
+        signedMintTransaction = await wallet.signTransaction(mintTransaction);
+        console.log('✅ Transaction signed successfully');
+      } catch (signError) {
+        console.error('❌ Wallet signing error:', signError);
+        
+        // Provide specific error messages based on error type
+        let errorMessage = 'Failed to sign transaction';
+        const errorStr = signError instanceof Error ? signError.message : String(signError);
+        
+        if (errorStr.includes('not been authorised') || errorStr.includes('not authorized') || errorStr.includes('WalletSignTransactionError')) {
+          errorMessage = 'Wallet authorization failed. Please: (1) Disconnect your wallet, (2) Reconnect it, (3) Ensure you approve all transaction prompts. If using Phantom, check that you have approved the app in wallet settings.';
+        } else if (errorStr.includes('User rejected') || errorStr.includes('rejected') || errorStr.includes('declined')) {
+          errorMessage = 'Transaction was rejected. Please approve the transaction in your wallet to continue.';
+        } else if (errorStr.includes('timeout') || errorStr.includes('timed out')) {
+          errorMessage = 'Wallet signing timed out. Please try again and approve quickly when prompted.';
+        } else if (errorStr.includes('not supported') || errorStr.includes('does not support')) {
+          errorMessage = 'Your wallet does not support signing transactions. Please use Phantom, Solflare, Backpack, or another compatible Solana wallet.';
+        } else {
+          errorMessage = `Wallet signing failed: ${errorStr}. Please try disconnecting and reconnecting your wallet.`;
+        }
+        
+        throw new Error(errorMessage);
+      }
 
       // Verify the signed transaction has all required signatures
       if (!signedMintTransaction.signatures || signedMintTransaction.signatures.length === 0) {
-        throw new Error('Transaction was not signed properly');
+        throw new Error('Transaction was not signed properly. Please try again and ensure you approve the transaction in your wallet.');
       }
 
       console.log('Transaction signed with', signedMintTransaction.signatures.length, 'signature(s)');
@@ -734,7 +760,29 @@ export class CreateTokenService {
         console.log(`Service fee transaction created`);
         console.log(`  - Service fee: ${serviceFeeLamports / LAMPORTS_PER_SOL} SOL`);
 
-        const signedFeeTransaction = await wallet.signTransaction(feeTransaction);
+        // Sign fee transaction with enhanced error handling
+        let signedFeeTransaction;
+        try {
+          console.log('Requesting wallet signature for fee transaction...');
+          signedFeeTransaction = await wallet.signTransaction(feeTransaction);
+          console.log('✅ Fee transaction signed successfully');
+        } catch (signError) {
+          console.error('❌ Wallet signing error for fee transaction:', signError);
+          
+          let errorMessage = 'Failed to sign fee transaction';
+          const errorStr = signError instanceof Error ? signError.message : String(signError);
+          
+          if (errorStr.includes('not been authorised') || errorStr.includes('not authorized') || errorStr.includes('WalletSignTransactionError')) {
+            errorMessage = 'Wallet authorization failed for fee transaction. Please reconnect your wallet and try again.';
+          } else if (errorStr.includes('User rejected') || errorStr.includes('rejected')) {
+            errorMessage = 'Fee transaction was rejected. Please approve the transaction to complete token creation.';
+          } else {
+            errorMessage = `Fee transaction signing failed: ${errorStr}`;
+          }
+          
+          throw new Error(errorMessage);
+        }
+
         const feeTxSignature = await this.connection.sendRawTransaction(signedFeeTransaction.serialize(), {
           skipPreflight: false,
           preflightCommitment: 'confirmed',

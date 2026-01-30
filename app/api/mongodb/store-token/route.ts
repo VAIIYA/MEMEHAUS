@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { storeTokenDataInMongoDB, storeCreatorWalletInMongoDB } from '../../../lib/mongodbStorage';
+import { storeTokenData, storeCreatorWallet } from '../../../lib/unifiedStorage';
 import { TokenData } from '../../../lib/types';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * API route to store token data in MongoDB (backup storage)
+ * API route to store token data in both MongoDB and Turso
  * POST /api/mongodb/store-token
+ * Now uses unified storage with MongoDB primary + Turso fallback
  */
 export async function POST(request: NextRequest) {
   try {
@@ -20,13 +21,13 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Store token data
-    const tokenResult = await storeTokenDataInMongoDB(tokenData as TokenData);
+    // Store token data in both databases
+    const tokenResult = await storeTokenData(tokenData as TokenData);
 
     // Also store creator wallet if provided
     let creatorResult = null;
     if (creatorWallet && tokenData.mintAddress) {
-      creatorResult = await storeCreatorWalletInMongoDB(
+      creatorResult = await storeCreatorWallet(
         creatorWallet,
         tokenData.mintAddress
       );
@@ -35,11 +36,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: tokenResult.success,
       tokenId: tokenResult.id,
+      source: tokenResult.source,
       creatorStored: creatorResult?.success || false,
+      creatorSource: creatorResult?.source,
       error: tokenResult.error
     });
   } catch (error) {
-    console.error('Error storing token data in MongoDB:', error);
+    console.error('Error storing token data:', error);
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'

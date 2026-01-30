@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllCreatorsFromMongoDB } from '../../../lib/mongodbStorage';
+import { getAllCreators } from '../../../lib/unifiedStorage';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('API: Fetching creators from MongoDB...');
+    console.log('API: Fetching creators from unified storage...');
     
-    const creators = await getAllCreatorsFromMongoDB();
+    const creators = await getAllCreators();
     
-    console.log(`API: Found ${creators.length} creators in MongoDB`);
+    console.log(`API: Found ${creators.length} creators in unified storage`);
     
     return NextResponse.json({
       success: true,
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('API: Error fetching creators from MongoDB:', error);
+    console.error('API: Error fetching creators:', error);
     
     return NextResponse.json({
       success: false,

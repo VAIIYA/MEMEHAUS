@@ -27,10 +27,42 @@ export const useTokenCreation = () => {
   }, [connected, connection.rpcEndpoint]);
 
   const createToken = useCallback(async (params: TokenCreationParams): Promise<TokenCreationResult> => {
-    if (!connected || !publicKey || !signTransaction) {
+    // Enhanced wallet validation
+    if (!connected) {
       return {
         success: false,
-        error: 'Wallet not connected or cannot sign transactions',
+        error: 'Wallet not connected. Please connect your wallet first.',
+      };
+    }
+
+    if (!publicKey) {
+      return {
+        success: false,
+        error: 'Wallet public key not available. Please reconnect your wallet.',
+      };
+    }
+
+    if (!signTransaction) {
+      return {
+        success: false,
+        error: 'Your wallet does not support transaction signing. Please use a compatible wallet like Phantom, Solflare, or Backpack.',
+      };
+    }
+
+    // Validate wallet is ready for signing
+    try {
+      // Test if we can access the public key (some wallets report connected but aren't fully ready)
+      const pubKeyString = publicKey.toBase58();
+      if (!pubKeyString || pubKeyString.length < 32) {
+        return {
+          success: false,
+          error: 'Wallet public key is invalid. Please reconnect your wallet.',
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Wallet validation failed. Please reconnect your wallet and try again.',
       };
     }
 
