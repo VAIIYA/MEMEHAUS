@@ -309,7 +309,7 @@ export async function getAllCreators(): Promise<string[]> {
   }
 
   // Combine and deduplicate
-  const allCreators = [...new Set([...mongoCreators, ...tursoCreators])];
+  const allCreators = Array.from(new Set([...mongoCreators, ...tursoCreators]));
   console.log(`✅ Total unique creators: ${allCreators.length}`);
   return allCreators;
 }

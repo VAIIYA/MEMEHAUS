@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { testTursoConnection, initializeTursoSchema } from '../../lib/tursoStorage';
-import { testMongoDBConnection } from '../../lib/mongodbStorage';
+import { testTursoConnection, initializeTursoSchema } from '../../../lib/tursoStorage';
+import { testMongoDBConnection } from '../../../lib/mongodbStorage';
 
 export const dynamic = 'force-dynamic';
 
