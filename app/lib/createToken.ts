@@ -375,6 +375,7 @@ export class CreateTokenService {
       // Get rent exemptions
       const mintRentExempt = await this.connection.getMinimumBalanceForRentExemption(82);
       const tokenAccountRentExempt = await this.connection.getMinimumBalanceForRentExemption(165);
+      const metadataRentExempt = await this.connection.getMinimumBalanceForRentExemption(679); // Metadata account size
 
       // Build transaction with all instructions
       const mintTransaction = new Transaction();
@@ -1372,35 +1373,35 @@ export class CreateTokenService {
       // Get rent exemptions for accounts that will be created
       const rentExemptionMint = await this.connection.getMinimumBalanceForRentExemption(82); // Mint account size
       const rentExemptionTokenAccount = await this.connection.getMinimumBalanceForRentExemption(165); // Token account size
+      const rentExemptionMetadata = await this.connection.getMinimumBalanceForRentExemption(679); // Metadata account size (Metaplex)
 
       // We create 3 token accounts: creator, liquidity vault, community vault
       const tokenAccountRent = rentExemptionTokenAccount * 3;
 
       // Calculate transaction fees
-      // Main transaction: mint creation + 3 token accounts + 3 mints + revoke authority
+      // Main transaction: mint creation + 3 token accounts + 3 mints + metadata + revoke authority
       const mainTransactionFee = 0.000005 * LAMPORTS_PER_SOL; // Base transaction fee
       // Service fee transaction (separate)
       const serviceFeeTransactionFee = 0.000005 * LAMPORTS_PER_SOL;
-      // Metadata transaction (separate)
-      const metadataTransactionFee = 0.000005 * LAMPORTS_PER_SOL;
 
-      const totalTransactionFees = mainTransactionFee + serviceFeeTransactionFee + metadataTransactionFee;
+      const totalTransactionFees = mainTransactionFee + serviceFeeTransactionFee;
 
       // Service fee (SOL)
       const serviceFee = 0.001 * LAMPORTS_PER_SOL; // 0.001 SOL service fee
 
-      // Add buffer for network fee fluctuations (15% buffer for safety)
-      const subtotal = rentExemptionMint + tokenAccountRent + totalTransactionFees + serviceFee;
-      const buffer = Math.ceil(subtotal * 0.15);
+      // Add buffer for network fee fluctuations (20% buffer for safety)
+      const subtotal = rentExemptionMint + tokenAccountRent + rentExemptionMetadata + totalTransactionFees + serviceFee;
+      const buffer = Math.ceil(subtotal * 0.20);
 
       const totalCost = (subtotal + buffer) / LAMPORTS_PER_SOL;
 
       console.log('Cost breakdown:');
       console.log('- Mint account rent:', rentExemptionMint / LAMPORTS_PER_SOL, 'SOL');
       console.log('- Token accounts rent (3 accounts):', tokenAccountRent / LAMPORTS_PER_SOL, 'SOL');
-      console.log('- Transaction fees (3 transactions):', totalTransactionFees / LAMPORTS_PER_SOL, 'SOL');
+      console.log('- Metadata account rent:', rentExemptionMetadata / LAMPORTS_PER_SOL, 'SOL');
+      console.log('- Transaction fees (2 transactions):', totalTransactionFees / LAMPORTS_PER_SOL, 'SOL');
       console.log('- Service fee:', serviceFee / LAMPORTS_PER_SOL, 'SOL');
-      console.log('- Buffer (15%):', buffer / LAMPORTS_PER_SOL, 'SOL');
+      console.log('- Buffer (20%):', buffer / LAMPORTS_PER_SOL, 'SOL');
       console.log('- Total estimated cost:', totalCost, 'SOL');
       console.log('Note: Token distribution: 20% creator, 70% liquidity vault, 10% community vault');
 
@@ -1408,7 +1409,7 @@ export class CreateTokenService {
     } catch (error) {
       console.error('Error estimating creation cost:', error);
       // Return a safe default estimate
-      return 0.006; // 0.006 SOL as safe default (mint + 3 token accounts + fees)
+      return 0.025; // 0.025 SOL as safe default (mint + 3 token accounts + metadata + fees)
     }
   }
 }

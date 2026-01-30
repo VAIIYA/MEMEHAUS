@@ -274,11 +274,13 @@ export const TokenCreationModal: React.FC<TokenCreationModalProps> = ({
             </span>
           </div>
           <div className="mt-2 space-y-1 text-xs text-gray-500">
-            <p>• Mint account creation: ~0.002 SOL</p>
-            <p>• Token account creation: ~0.002 SOL</p>
+            <p>• Mint account rent: ~0.0015 SOL</p>
+            <p>• Token accounts rent (3x): ~0.006 SOL</p>
+            <p>• Metadata account rent: ~0.015 SOL</p>
+            <p>• Service fee: ~0.001 SOL</p>
             <p>• Transaction fees: ~0.00001 SOL</p>
 
-            <p className="text-neon-cyan font-semibold">Total: ~{estimatedCost > 0 ? estimatedCost.toFixed(4) : '0.004'} SOL</p>
+            <p className="text-neon-cyan font-semibold">Total: ~{estimatedCost > 0 ? estimatedCost.toFixed(4) : '0.025'} SOL</p>
           </div>
           <div className="mt-3 p-2 bg-blue-500/20 border border-blue-500/30 rounded-lg">
             <p className="text-xs text-blue-400">
