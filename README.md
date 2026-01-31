@@ -19,13 +19,22 @@ MemeHaus is your all-in-one Solana hub — create, trade, stake, and explore the
 
 ## 🎨 Design Inspiration
 
-MemeHaus combines sleek design with Solana.com's signature color palette:
+MemeHaus features a premium, Metamask-inspired light theme designed for clarity and a professional feel:
 
-- **Primary Green**: `#14F195` (Solana Green)
-- **Secondary Purple**: `#9945FF` (Solana Purple)
-- **Accent Coral**: `#FF6B6B` (Coral Accent)
-- **Dark Background**: `#0F0F23` (Deep Space)
-- **Card Background**: `#1E1E2E` (Glass Morphism)
+- **Primary Background**: `#F5F7FA` (Metamask Gray-50)
+- **Primary Purple**: `#4C2D8E` (Metamask Purple)
+- **Accent Orange**: `#FF5C16` (Metamask Orange)
+- **Text Color**: `#111111` (Deep Black)
+- **Card Aesthetics**: White glassmorphism with subtle shadows and border-radius.
+- **Typography**: Poly Variable (Serif) for headings and Inter (Sans) for body.
+
+## 📚 Documentation
+
+Detailed technical guides have been moved to the [docs/](./docs) directory:
+- [Fee System Guide](./docs/FEE_SYSTEM_GUIDE.md) - Details on the 90/10 split and distribution.
+- [MongoDB Setup](./docs/MONGODB_SETUP.md) - Database configuration and schema.
+- [Server Wallet Security](./docs/SERVER_WALLET_SECURITY.md) - Best practices for automated transaction handling.
+- [RPC Setup Guide](./docs/RPC_SETUP_GUIDE.md) - Configuring Solana RPC endpoints.
 
 ## 🛠️ Tech Stack
 
